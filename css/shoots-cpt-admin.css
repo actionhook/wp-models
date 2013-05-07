@@ -1,0 +1,31 @@
+.wp-models-media-container
+{
+	clear: both;
+}
+
+.wp-models-plupload
+{
+}
+
+.wp-models-toggle
+{
+	float: right;
+}
+
+.wp-models-shoot-pic
+{
+	width: 	11%;
+	float: left;
+	margin-right: 1.5%;
+	min-width: 100px;
+}
+
+.wp-models-shoot-pic img
+{
+	width: 100%;
+}
+
+.wp-models-player
+{
+}
+/* Media Queries */
