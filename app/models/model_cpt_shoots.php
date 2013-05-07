@@ -9,12 +9,13 @@
  */
 if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	/**
-	 * Description
+	 * The WP Models Shoots CPT Model
 	 *
 	 * @package pkgtoken
 	 * @subpackage subtoken
 	 * @version 0.1
 	 * @since WP Models 0.1
+	 * @todo Add Rackspace CloudFiles support
 	 */
 	class WP_Models_CPT_Shoots_Model extends Base_CPT_Model
 	{
@@ -43,8 +44,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 	 *
 	 	 * @package pkgtoken
 	 	 * @subpackage subtoken
-	 	 * @version 0.1
-	 	 * @since WP Models 0.1
+	 	 * @since 0.1
 	 	 */
 	 	public function __construct( $txtdomain )
 	 	{
@@ -136,8 +136,9 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 *
 		 * @param string $post_id
 		 * @param string $txtdomain The text domain to use for the label translations.
-		 * @since 0.1
 		 * @see http://codex.wordpress.org/Function_Reference/add_meta_boxes
+		 * @since 0.1
+		 * @todo modify this to be private and add a getter function
 		 */
 		public function init_metaboxes( $post_id, $txtdomain = '' )
 		{	
@@ -218,14 +219,14 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		}
 		
 		/**
-		 * Description
+		 * Initialize the admin_scripts property.
 		 *
 		 * @package pkgtoken
 		 * @subpackage subtoken
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The plugin text domain.
 		 * @param string $nonce The WP nonce for security.
-		 * @since 
+		 * @since 0.1
 		 */
 		protected function init_admin_scripts( $post, $txtdomain, $nonce )
 		{			
@@ -308,7 +309,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		}
 		
 		/**
-		 * get the models in a shoot
+		 * Get the models in a shoot.
 		 *
 		 * @package pkgtoken
 		 * @subpackage subtoken
@@ -336,7 +337,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		}
 		
 		/**
-		 * Get a model's shoots
+		 * Get a model's shoots.
 		 *
 		 * @package pkgtoken
 		 * @subpackage subtoken
@@ -367,18 +368,21 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		}
 		
 		/**
-		 * Get all media of a certain type attached to the shoot
+		 * Get all media of a certain type attached to the shoot.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
-		 * @param string $post_id
-		 * @param string $type the media type (pics, vids)
-		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
-		 * @returns array $contents An array containing the following elements:
+		 * This function will call the appropriate content getter function based upon the $location property. This currently supports local storage as well as Amazon S3.
+		 * It will return an array containing information regarding the files present. Each item in the array will itself be an array with the following elements:
 		 * 		uri- the media item uri
 		 * 		filename- the media item filename
 		 * 		filetype- the file extension (jpg, png, etc)
 		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
+		 
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $post_id
+		 * @param string $type The media type (pics, vids). This is used to determine storage location directories
+		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
+		 * @return array $contents 
 		 * @since 0.1
 		 */
 		public function get_shoot_media( $post_id, $type, $location = 'local', $access_key = null, $secret_key = null , $bucket = null )
@@ -405,6 +409,21 @@ print( "LOCATION:" . $location);
 			}
 		}
 		
+		/**
+		 * Get all media of a certain type attached to the shoot
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $post_id
+		 * @param string $type the media type (pics, vids)
+		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
+		 * @return array $contents An array containing the following elements:
+		 * 		uri- the media item uri
+		 * 		filename- the media item filename
+		 * 		filetype- the file extension (jpg, png, etc)
+		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
+		 * @since 0.1
+		 */
 		private function get_shoot_media_local( $post_id, $type )
 		{
 			print( "LOCAL" );
@@ -446,6 +465,21 @@ print( "LOCATION:" . $location);
 			return $contents;
 		}
 		
+		/**
+		 * Get shoot media stored in Amazon S3
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $post_id The shoot post id.
+		 * @param string $type The media type ( pics, vids ).
+		 * @param string $access_key The remote storage service public access key.
+		 * @param string $secret_key The remote storage service secret key.
+		 * @param string $bucket The remote storage service content location.
+		 * @return array $contents An array containing the following elements:
+		 * 		uri- the media item uri
+		 * 		filename- the media item filename 
+		 * @since 0.1
+		 */
 		private function get_shoot_media_amazonS3( $post_id, $type, $access_key, $secret_key, $bucket )
 		{
 			if( ! class_exists( S3 ) )
@@ -473,6 +507,9 @@ print( "LOCATION:" . $location);
 					$contents[] = array(
 						'uri' => $s3->getAuthenticatedURL( $bucket, $file['name'], 3600, false, is_SSL() ),
 						'filename' => $filename[2]
+						/**
+						 * @todo Are the following elements necessary?
+						 */
 						/*
 'filetype' => $filetype['ext'],
 						'mimetype' => $filetype['type']
@@ -480,7 +517,7 @@ print( "LOCATION:" . $location);
 					);
 				endif;
 			endforeach;
-			print_r($contents);
+			
 			return $contents;
 		
 		}
