@@ -2,19 +2,18 @@
 /**
  * The Models custom post type model.
  *
- * @package pkgtoken
- * @subpackage subtoken
+ * @package WP Models
+ * @subpackage Custom Post Types
  * @author authtoken
- * @version
- * @since
+ * @since 0.1
  */
 
 if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	/**
 	 * The Models model class.
 	 *
-	 * @package pkgtoken
-	 * @subpackage subtoken
+	 * @package WP Models
+	 * @subpackage Custom Post Types
 	 * @version 0.1
 	 * @since WP Models 0.1
 	 */
@@ -23,9 +22,10 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 	/**
 	 	 * The class constructor.
 	 	 *
-	 	 * @package pkgtoken
-	 	 * @subpackage subtoken
-	 	 * @since 
+	 	 * @package WP Models
+	 	 * @subpackage Custom Post Types
+	 	 * @param string $txtdomain The plugin textdomain. used to localize the arguments.
+	 	 * @since 0.1
 	 	 */
 	 	public function __construct( $txtdomain )
 	 	{
@@ -38,8 +38,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 	/**
 		 * initialize the CPT arguments for register_post_type
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param string $txtdomain
 		 * @see http://codex.wordpress.org/Function_Reference/register_post_type
 		 * @since 0.1
@@ -88,8 +88,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		/**
 		 * initialize the CPT meta boxes
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 *
 		 * @param string $post_id
 		 * @param string $txtdomain The text domain to use for the label translations.
@@ -112,9 +112,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 					'side',
 					'default',
 					array (
-						'view' => 'model_details_metabox.php',
+						'view' => 'metabox_model_details.php',
 						'model_age' => isset( $meta['model_age'] ) ? $meta['model_age'] : '' ,
-						'model_sign' => isset( $meta['model_sign'] ) ? $meta['model_sign']: ''
 					)
 				)
 			);
@@ -123,8 +122,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		/**
 		 * Get the CPT messages
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The text domain to use for localization.
 		 * @return array $messages The messages array.
@@ -153,6 +152,14 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 			return $messages;
 		}
 		
+		/**
+		 * Save the post meta.
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $post_id The WP post ID.
+		 * @since 0.1
+		 */
 		public function save( $post_id )
 		{
 			if ( isset( $_POST['wp-models-model-age'] ) )
@@ -167,8 +174,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		/**
 		 * Get all models.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @returns array $models An array containing the post objects for each model.
 		 * @since 0.1
 		 */
@@ -185,16 +192,18 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 			return $models;
 		}
 		
+		/**
+		 * Get a model's age
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $model_id The WP post ID for this model.
+		 * @since 0.1
+		 */
 		public function get_model_age( $model_id )
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return $meta['model_age'];
-		}
-		
-		public function get_model_sign( $model_id )
-		{
-			$meta =  get_post_meta( $model_id, $this->metakey, true );
-			return $meta['model_sign'];
 		}
 	 }
 endif;

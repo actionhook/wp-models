@@ -2,23 +2,29 @@
 /**
  * Main plugin controller.
  *
- * @package pkgtoken
- * @subpackage subtoken
+ * @package WP Models
  * @author authtoken
- * @since 0.1
  */
 
 if ( ! class_exists( WP_Models ) ):
 	/**
-	 * The main WP_Models controllers class
+	 * The main WP_Models controller class
 	 *
-	 * @package pkgtoken
-	 * @subpackage subtoken
+	 * @package WP Models
+	 *
 	 * @version 0.1
-	 * @since 0.1
+	 * @since WP Models 0.1
+	 * @todo add activate function that creates db table
 	 */
 	 class WP_Models extends Base_Plugin_Controller
 	 {
+	 	/**
+	 	 * Initialize the plugin
+	 	 *
+	 	 * @package WP Models
+	 	 *
+	 	 * @since 0.1
+	 	 */
 	 	public function init()
 	 	{
 	 		//get the plugin settings
@@ -37,7 +43,8 @@ if ( ! class_exists( WP_Models ) ):
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
 	 		$this->nonce_action = '5tyhjDR%6%$%^&*IuhbnmknbGTRFGHJN';
-	 			
+	 		
+	 		//filter metabox callback args as necessary
 	 		add_filter( 'filter_metabox_callback_args', array( &$this, 'setup_metabox_args' ), 10, 2 );
 	 		
 	 		//add our ajax callbacks
@@ -46,7 +53,7 @@ if ( ! class_exists( WP_Models ) ):
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_pic', array( &$this, 'ajax_delete_shoot_media' ) );
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_vid', array( &$this, 'ajax_delete_shoot_media' ) );
 	 		
-	 		//filter js l10n as neccessary
+	 		//filter js l10n as necessary
 	 		add_filter( 'filter_script_localizations', array( &$this, 'filter_shoot_cpt_admin_js' ), 10, 2 );
 	 		
 	 		// Support the file format webm mimetype
@@ -56,8 +63,8 @@ if ( ! class_exists( WP_Models ) ):
 	 	/**
 	 	 * Add additional metabox callback args as necessary for views.
 	 	 *
-	 	 * @package pkgtoken
-	 	 * @subpackage subtoken
+	 	 * @package WP Models
+	 	 *
 	 	 * @param object $post The WP post object.
 	 	 * @param array $metabox The WP metabox array.
 	 	 * @return array $metabox The modified WP metabox array.
@@ -78,6 +85,14 @@ if ( ! class_exists( WP_Models ) ):
 	 		return $metabox;
 	 	}
 	 	
+	 	
+	 	/**
+	 	 * The ajax media upload callback.
+	 	 *
+	 	 * @package WP Models
+	 	 *
+	 	 * @since 0.1
+	 	 */
 	 	public function ajax_media_upload()
 	 	{
 	 		//check for security
@@ -89,6 +104,13 @@ if ( ! class_exists( WP_Models ) ):
 	 		die();
 	 	}
 	 	
+	 	/**
+	 	 * The ajax media render callback
+	 	 *
+	 	 * @package WP Models
+	 	 *
+	 	 * @since 0.1
+	 	 */
 	 	public function ajax_get_shoot_media()
 	 	{
 	 		//configure the get_shoot_media parameters and include required files based on storage location
@@ -129,6 +151,13 @@ if ( ! class_exists( WP_Models ) ):
 	 		die( $html );
 	 	}
 	 	
+	 	/**
+	 	 * The callback for the ajax delete media handler.
+	 	 *
+	 	 * @package WP Models
+	 	 *
+	 	 * @since 0.1
+	 	 */
 	 	public function ajax_delete_shoot_media()
 	 	{
 	 		//check for security
@@ -146,6 +175,14 @@ if ( ! class_exists( WP_Models ) ):
 	 		die( $result );
 	 	}
 	 	
+	 	/**
+	 	 * Add mime types to WP
+	 	 *
+	 	 * @package WP Models
+	 	 *
+	 	 * @param array $mimes The exising mimes object.
+	 	 * @since 0.1
+	 	 */
 	 	public function custom_mimes( $mimes )
 	 	{
 			$mimes['webm'] = 'video/webm';
@@ -155,9 +192,11 @@ if ( ! class_exists( WP_Models ) ):
 		/**
 		 * Filter the arguments for the wp-models-cpt-shoots-admin js
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
-		 * @since 
+		 * @package WP Models
+		 *
+		 * @param string $handle The script handle registered with wp_enquque_script.
+		 * @param array $args Contains key/value pairs of script localizations.
+		 * @since 0.1
 		 */
 		public function filter_shoot_cpt_admin_js( $handle, $args )
 		{
@@ -215,6 +254,14 @@ if ( ! class_exists( WP_Models ) ):
 			return $args;
 		}
 		
+		/**
+		 * The plugin deletion callback
+		 *
+		 * @package WP Models
+		 *
+		 * @since 0.1
+		 * @todo implement this function
+		 */
 	 	public function delete()
 	 	{
 	 		//delete the shoot models table

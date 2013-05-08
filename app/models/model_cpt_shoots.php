@@ -2,28 +2,29 @@
 /**
  * The Shoots Custom Post Type
  *
- * @package pkgtoken
- * @subpackage subtoken
+ * @package WP Models
+ * @subpackage Custom Post Types
  * @author authtoken
- * @since
+ * @since 0.1
  */
 if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	/**
 	 * The WP Models Shoots CPT Model
 	 *
-	 * @package pkgtoken
-	 * @subpackage subtoken
+	 * @package WP Models
+	 * @subpackage Custom Post Types
 	 * @version 0.1
 	 * @since WP Models 0.1
 	 * @todo Add Rackspace CloudFiles support
+	 * @todo Add Dropbox support
 	 */
 	class WP_Models_CPT_Shoots_Model extends Base_CPT_Model
 	{
 		/**
 		 * The media upload directory path
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @var string
 		 * @since 0.1
 		 */
@@ -32,8 +33,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * The media upload directory uri
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @var string
 		 * @since 0.1
 		 */
@@ -42,8 +43,9 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 	 	 * The class constructor.
 	 	 *
-	 	 * @package pkgtoken
-	 	 * @subpackage subtoken
+	 	 * @package WP Models
+	 	 * @subpackage Custom Post Types
+	 	 * @param $txtdomain The plugin text domain. Used to localize the arguments.
 	 	 * @since 0.1
 	 	 */
 	 	public function __construct( $txtdomain )
@@ -84,8 +86,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 	/**
 		 * initialize the CPT arguments for register_post_type
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param string $txtdomain
 		 * @see http://codex.wordpress.org/Function_Reference/register_post_type
 		 * @since 0.1
@@ -131,16 +133,15 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * initialize the CPT meta boxes
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 *
 		 * @param string $post_id
 		 * @param string $txtdomain The text domain to use for the label translations.
 		 * @see http://codex.wordpress.org/Function_Reference/add_meta_boxes
 		 * @since 0.1
-		 * @todo modify this to be private and add a getter function
 		 */
-		public function init_metaboxes( $post_id, $txtdomain = '' )
+		protected function init_metaboxes( $post_id, $txtdomain = '' )
 		{	
 			if ( $txtdomain = '' and isset( $this->txtdomain ) )
 				$txtdomain = $this->txtdomain;
@@ -188,8 +189,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get the CPT messages
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The text domain to use for localization.
 		 * @return array $messages The messages array.
@@ -221,8 +222,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Initialize the admin_scripts property.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The plugin text domain.
 		 * @param string $nonce The WP nonce for security.
@@ -270,8 +271,9 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Save the shoot cpt meta.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $post_id The WP post ID.
 		 * @since 0.1
 		 */
 		public function save( $post_id )
@@ -311,8 +313,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get the models in a shoot.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param string $shoot_id the post ID of the shoot
 		 * @return array $models An array containing the post id's of the models in the shoot.
 		 * @since 0.1
@@ -339,8 +341,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get a model's shoots.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param string $model_id the post id of the model
 		 * @return array $shoots contains the post id's of the shoots for this model
 		 * @since 0.1
@@ -377,22 +379,19 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * 		filetype- the file extension (jpg, png, etc)
 		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
 		 
-		 * @package pkgtoken
-		 * @subpackage subtoken
-		 * @param string $post_id
-		 * @param string $type The media type (pics, vids). This is used to determine storage location directories
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $post_id The WP post ID.
+		 * @param string $type The media type (pics, vids). This is used to determine storage location directories.
 		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
+		 * @param string $access_key The remote storage service access key.
+		 * @param string $secret_key The remote storage service secret key.
+		 * @param string $bucket The remote storage service storage location.
 		 * @return array $contents 
 		 * @since 0.1
 		 */
 		public function get_shoot_media( $post_id, $type, $location = 'local', $access_key = null, $secret_key = null , $bucket = null )
 		{
-			/*
-print( "LOCATION:" . $location);
-			print( "ACCESSKEY:" . $access_key);
-			print( "SECRET:" . $secret_key);
-			print( "BUCKET:" . $bucket);
-*/
 			switch( $location ){
 				case 'local':
 					return $this->get_shoot_media_local( $post_id, $type );
@@ -410,13 +409,12 @@ print( "LOCATION:" . $location);
 		}
 		
 		/**
-		 * Get all media of a certain type attached to the shoot
+		 * Get shoot media stored locally.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param string $post_id
 		 * @param string $type the media type (pics, vids)
-		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
 		 * @return array $contents An array containing the following elements:
 		 * 		uri- the media item uri
 		 * 		filename- the media item filename
@@ -468,8 +466,8 @@ print( "LOCATION:" . $location);
 		/**
 		 * Get shoot media stored in Amazon S3
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param string $post_id The shoot post id.
 		 * @param string $type The media type ( pics, vids ).
 		 * @param string $access_key The remote storage service public access key.
@@ -494,13 +492,13 @@ print( "LOCATION:" . $location);
 			 * todo: modify to allow for truncated results
 			 */
 			$bucket_contents = $s3->getBucket( $bucket );
-			print_r( $bucket_contents);
+			//print_r( $bucket_contents);
 			
 			foreach( $bucket_contents as $file ):
-				print_r( $file );
+				//print_r( $file );
 				//split the name into elements e.g. 76/pics/foo.jpg => array( [0] => '76', [1] => 'pics', [2] => 'foo' )
 				$filename = explode( '/', $file['name'] );
-				print_r( $filename );
+				//print_r( $filename );
 				if( $filename[0] == $post_id && $filename[1] == $type ):
 					//move to this last element of the array, this will be the file name
 					end( $filename );
@@ -525,8 +523,8 @@ print( "LOCATION:" . $location);
 		/**
 		 * Save the media attached to this shoot
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models
+		 * @subpackage Custom Post Types
 		 * @param object $post The $_POST object.
 		 * @param object $files The $_FILES object.
 		 * @param bool $log Log the file upload. Default is false.
