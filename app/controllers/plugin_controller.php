@@ -254,6 +254,10 @@ if ( ! class_exists( WP_Models ) ):
 			return $args;
 		}
 		
+		public static function activate()
+		{
+		}
+		
 		/**
 		 * The plugin deletion callback
 		 *
