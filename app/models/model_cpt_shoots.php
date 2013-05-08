@@ -540,6 +540,54 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 		
 	 		Helper_Functions::plupload( $_POST, $_FILES, $target, $log );
 		}
+		
+		/**
+		 * Actions required to happen at plugin activation for this CPT
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @since 0.1
+		 */
+		public function activate()
+		{
+			global $wpdb;
+			
+			$db_table_name = $wpdb->prefix . $this->shoot_model_table;
+			$wpdb->query( 
+				$wpdb->prepare( 
+					"
+			         CREATE TABLE IF NOT EXISTS `$db_table_name`  (
+						`shoot_id` int(11) NOT NULL DEFAULT '0',
+						`model_id` int(11) NOT NULL DEFAULT '0',
+						PRIMARY KEY (`model_id`,`shoot_id`),
+						KEY `model_id` (`model_id`),
+						KEY `shoot_id` (`shoot_id`)
+					) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+					"
+			        )
+			);
+		}
+		
+		/**
+		 * Actions reqired to happen at plugin deletion
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @since 0.1
+		 */
+		 public function delete()
+		 {
+		 	global $wpdb;
+			
+			$db_table_name = $wpdb->prefix . $this->shoot_model_table;
+		 	$wpdb->query( 
+				$wpdb->prepare( 
+					"
+			         DROP TABLE IF EXISTS `$db_table_name`;
+					"
+			        )
+			);
+		 }
 	 }
 endif;
 ?>
