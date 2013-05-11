@@ -13,9 +13,14 @@ jQuery(document).ready(function()
 	//wp_models_init_video_players();
 	
 	//load the ajax content
-	wp_models_reload_shoot_pics();
-	wp_models_reload_shoot_vids();
+	wp_models_reload_pics();
+	wp_models_reload_vids();
 });
+
+function wp_models_init_colorbox()
+{
+	jQuery('a.wp-models-model-gallery').colorbox();
+}
 
 function wp_models_init_uploaders()
 {
@@ -23,7 +28,7 @@ function wp_models_init_uploaders()
 		// General settings
 		url: wpModelsL10n.url,
 		runtimes : 'html5,flash,silverlight',
-		max_file_size : '200mb',
+		max_file_size : '700mb',
 		multiple_queues: true,
 		multipart_params: wp_models_get_multipart_params(),
 		// Flash settings
@@ -68,7 +73,7 @@ function wp_models_get_multipart_params()
 		{
 			'key': '${filename}',
 			'AWSAccessKeyId' : wpModelsL10n['accessKeyId'],
-			'acl': 'public-read',
+			'acl': 'private',
 			'success_action_status': '201',
 			'Filename': '${filename}', // adding this to keep consistency across the runtimes
 			'policy': wpModelsL10n.policy,
@@ -79,9 +84,10 @@ function wp_models_get_multipart_params()
 	else if ( wpModelsL10n.storage == 'local' )
 	{
 		var wpm_multipart = {
-			'post_id': wpModelsL10n.post_id,
-        	'action': 'wp_models_media_upload',
-        	'nonce': wpModelsL10n['nonce']
+			post_id: wpModelsL10n.post_id,
+			post_type: wpModelsL10n.post_type,
+        	action: 'wp_models_media_upload',
+        	nonce: wpModelsL10n.nonce
 		};
 	}
 	
@@ -90,7 +96,8 @@ function wp_models_get_multipart_params()
 
 function wp_models_init_uploader_pics()
 {
-	var pics_uploader = jQuery("#wp-models-shoot-pics-uploader").pluploadQueue();
+	//var pics_uploader = jQuery("#wp-models-shoot-pics-uploader").pluploadQueue();
+	var pics_uploader = jQuery(".wp-models-pics-uploader").pluploadQueue();
 	
 	pics_uploader.bind('BeforeUpload', function(up, file)
 	{
@@ -112,6 +119,10 @@ function wp_models_init_uploader_pics()
         		//this can be spoofed
     			'Content-Type': 'image/' + file.name.split('.').pop().toLowerCase()
     		};
+    		if( additional_params.Content-Type === 'image/jpg' )
+    		{
+    			additional_params.Content-Type = 'image/jpeg';
+    		}
         }
         
         //extend the existing multipart_params
@@ -121,9 +132,10 @@ function wp_models_init_uploader_pics()
 	});
 		
 	pics_uploader.bind('UploadComplete', function(up, file, response )
-	{	
+	{
+		console.log( response );
 		//reload the div containing the elements
-		wp_models_reload_shoot_pics();
+		wp_models_reload_pics();
 	});
 }
 
@@ -153,13 +165,14 @@ function wp_models_init_uploader_vids()
 	        	'key': wpModelsL10n.post_id + '/vids/${filename}'
 	        });
         }
-        console.log('[UploadFile]', 'settings:', up.settings);
+        console.log('[BeforeUpload]', 'settings:', up.settings);
     });
 
 	vids_uploader.bind('UploadComplete', function(up, file, response)
 	{
+		console.log( '[UploadComplete]', response );
 		//reload the div containing the elements
-		wp_models_reload_shoot_vids();
+		wp_models_reload_vids();
 	});
 	
 }
@@ -172,56 +185,64 @@ function wp_models_init_video_players()
 	});
 }
 
-function wp_models_reload_shoot_pics() {
+function wp_models_reload_pics() {
 	var wpm_data = {
-		action: 'wp_models_shoot_media',
-		post: wpModelsL10n['post_id'],
-		nonce: wpModelsL10n['nonce'],
-		type: 'pics'
+		action: 'wp_models_get_media',
+		post: wpModelsL10n.post_id,
+		post_type: wpModelsL10n.post_type,
+		nonce: wpModelsL10n.nonce,
+		media_type: 'pics'
 	};
 	
 	jQuery.post( ajaxurl, wpm_data, function( response ) {
-		jQuery('#wp-models-shoot-pics-container').html( response );
+		jQuery('#wp-models-pics-container').html( response );
+		//initialize the colorbox
+		wp_models_init_colorbox();
 	});
 	
-	jQuery( '.wp-models-shoot-pic-delete' ).live( 'click', function(){
+	jQuery( '.wp-models-pic-delete' ).live( 'click', function(){
 		var wpm_data = {
 			action: 'wp_models_delete_shoot_pic',
-			nonce: wpModelsL10n['nonce'],
-			post_id: wpModelsL10n['post_id'],
+			nonce: wpModelsL10n.nonce,
+			post_id: wpModelsL10n.post_id,
+			post_type: wpModelsL10n.post_type,
+			media_type: 'pics',
 			media: jQuery( this ).val()
 		};
 		jQuery(this).html( "Deleting..." );
 		jQuery.post( ajaxurl, wpm_data, function( response ){
 			console.log( response );
-			wp_models_reload_shoot_pics();
+			wp_models_reload_pics();
 		});
 	});
 }
 
-function wp_models_reload_shoot_vids() {
+function wp_models_reload_vids() {
 	var wpm_data = {
-		action: 'wp_models_shoot_media',
-		post: wpModelsL10n['post_id'],
-		nonce: wpModelsL10n['nonce'],
-		type: 'vids'
+		action: 'wp_models_get_media',
+		post: wpModelsL10n.post_id,
+		post_type: wpModelsL10n.post_type,
+		nonce: wpModelsL10n.nonce,
+		media_type: 'vids'
 	};
 	
 	jQuery.post( ajaxurl, wpm_data, function( response ) {
-		jQuery('#wp-models-shoot-vids-container').html( response );
+		jQuery('#wp-models-vids-container').html( response );
 	});
 	
-	jQuery( '.wp-models-shoot-vid-delete' ).live( 'click', function(){
+	jQuery( '.wp-models-vid-delete' ).live( 'click', function(){
 		var wpm_data = {
 			action: 'wp_models_delete_shoot_vid',
-			nonce: wpModelsL10n['nonce'],
-			post_id: wpModelsL10n['post_id'],
+			nonce: wpModelsL10n.nonce,
+			post_id: wpModelsL10n.post_id,
+			post_type: wpModelsL10n.post_type,
+			media_type: 'vids',
 			media: jQuery( this ).val()
 		};
 		jQuery(this).html( "Deleting..." );
 		jQuery.post( ajaxurl, wpm_data, function( response ){
 			console.log( response );
-			wp_models_reload_shoot_vids();
+			wp_models_reload_vids();
 		});
 	});
 }
