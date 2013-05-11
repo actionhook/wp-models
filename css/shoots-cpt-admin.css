@@ -1,3 +1,8 @@
+/* set the menu icon for the post index admin page */
+#icon-edit.icon32-posts-wp-models-shoot {
+	background: url(../images/shoot-32x32.png) no-repeat;
+}
+
 .wp-models-media-container
 {
 	clear: both;
@@ -14,9 +19,9 @@
 
 .wp-models-shoot-pic
 {
-	width: 	11%;
+	width: 	18%;
 	float: left;
-	margin-right: 1.5%;
+	margin: 1em 1%;
 	min-width: 100px;
 }
 
@@ -25,7 +30,8 @@
 	width: 100%;
 }
 
-.wp-models-player
+.wp-models-player video
 {
+	max-width: 50%;
 }
 /* Media Queries */
