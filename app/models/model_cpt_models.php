@@ -19,6 +19,28 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 */
 	 class WP_Models_CPT_Models_Model extends Base_CPT_Model
 	 {
+	 	protected static $slug = 'wp-models-model';
+	 	
+	 	/**
+		 * The media upload directory path
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @var string
+		 * @since 0.1
+		 */
+		protected $media_upload_dir;
+		
+		/**
+		 * The media upload directory uri
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @var string
+		 * @since 0.1
+		 */
+		protected $media_upload_uri;
+		
 	 	/**
 	 	 * The class constructor.
 	 	 *
@@ -27,12 +49,16 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 	 * @param string $txtdomain The plugin textdomain. used to localize the arguments.
 	 	 * @since 0.1
 	 	 */
-	 	public function __construct( $txtdomain )
+	 	public function __construct( $uri, $txtdomain )
 	 	{
-	 		$this->slug = 'wp-models-model';
+	 		$uploads_dir = wp_upload_dir();
+	 		
+	 		//self::$slug = 'wp-models-model';
 	 		$this->noncename = 'wp-models-model';
 	 		$this->metakey = '_wp-models-model';
-	 		$this->init_args( $txtdomain );
+	 		$this->init_args( $uri, $txtdomain );
+	 		$this->media_upload_dir = trailingslashit( $uploads_dir['basedir'] ) . self::$slug;
+	 		$this->media_upload_uri = trailingslashit( content_url() ) . 'uploads/' . self::$slug;
 	 	}
 	 	
 	 	/**
@@ -44,7 +70,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		 * @see http://codex.wordpress.org/Function_Reference/register_post_type
 		 * @since 0.1
 		 */
-		protected function init_args( $txtdomain = '' )
+		protected function init_args( $uri, $txtdomain = '' )
 		{
 			if ( $txtdomain == '' and isset( $this->txtdomain ) )
 				$txtdomain = $this->txtdomain;
@@ -86,6 +112,160 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		}
 		
 		/**
+		 * Initialize the admin_scripts property.
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param object $post The WP post object.
+		 * @param string $txtdomain The plugin text domain.
+		 * @param string $uri The plugin js uri ( e.g. http://example.com/wp-content/plugins/myplugin/js )
+		 * @since 0.1
+		 */
+		public function init_admin_scripts( $post, $txtdomain, $uri )
+		{
+			$this->admin_scripts = array(
+	 			array(
+	 				'handle' => 'jquery-plupload-queue',
+	 				'src' => $uri . 'plupload/jquery.plupload.queue/jquery.plupload.queue.js',
+	 				'deps' => array( 'plupload-all' ),
+	 				'ver' => '1.5.7',
+	 				'in_footer' => false
+	 			),
+	 			array(
+		 			'handle' => 'wp-models-cpt-shoots-admin',
+		 			'src' => $uri . 'shoots-cpt-admin.js',
+		 			'deps' => array( 'jquery-plupload-queue' ),
+		 			'ver' => false,
+		 			'in_footer' => true
+	 			),
+	 			array(
+	 				'handle' => 'flowplayer',
+	 				'src' => $uri . 'flowplayer/flowplayer.js',
+	 				'deps' => array( 'jquery' ),
+	 				'ver' => '5.4.17',
+	 				'in_footer' => false
+	 			),
+	 			array(
+					'handle' => 'colorbox',
+					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox.js',
+					'deps' => array( 'jquery' ),
+					'ver' => '1.4.15',
+					'in_footer' => false
+				)
+	 		);
+	 		$this->admin_scripts_l10n = array(
+	 			array(
+	 				'script' => 'wp-models-cpt-shoots-admin',
+	 				'var' => 'wpModelsL10n',
+	 				'args' => array(
+	 					'storage' => 'local',	//deafult to local. Set later by plugin controller
+	 					'url' => admin_url( 'admin-ajax.php' ),
+	 					'post_id' => $post->ID,
+	 					'post_type' => self::$slug
+	 				)
+	 			)
+	 		);
+		}
+		
+		/**
+		 * initialize the admin_css property
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $uri The uri to the plugin css directory (e.g. http://example.com/wp-content/plugins/myplugin/css ).
+		 * @since 0.1
+		 */
+		public function init_admin_css( $uri )
+		{
+			$uri = trailingslashit( $uri );
+			
+			$this->admin_css = array(
+	 			array(
+	 				'handle' => 'jquery-plupload-queue',
+	 				'src' => $uri .  'plupload/jquery.plupload.queue/css/jquery.plupload.queue.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'shoots-cpt-admin',
+	 				'src' => $uri .  'shoots-cpt-admin.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'flowplayer',
+	 				'src' => $uri .  'flowplayer/functional.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'colorbox',
+	 				'src' => trailingslashit( $uri ) .  'colorbox/colorbox.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			)
+	 		);
+		}
+		
+		public function init_css( $uri )
+		{
+			$this->css = array(
+	 			array(
+	 				'handle' => 'wp-models-models',
+	 				'src' => trailingslashit( $uri ) .  'models.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'colorbox',
+	 				'src' => trailingslashit( $uri ) .  'colorbox/colorbox.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'flowplayer',
+	 				'src' => trailingslashit( $uri ) .  'flowplayer/minimalist.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			)
+	 		);
+		}
+		
+		public function init_scripts( $uri )
+		{
+			$this->scripts = array(
+				array(
+					'handle' => 'colorbox',
+					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox.js',
+					'deps' => array( 'jquery' ),
+					'ver' => '1.4.15',
+					'in_footer' => false
+				),
+				array(
+					'handle' => 'flowplayer',
+					'src' => trailingslashit( $uri ) . 'flowplayer/flowplayer.min.js',
+					'deps' => array( 'jquery' ),
+					'ver' => '5.4.1',
+					'in_footer' => false
+				),
+				array(
+					'handle' => 'wp-models-single-model',
+					'src' => trailingslashit( $uri ) . 'single-model.js',
+					'deps' => array( 'colorbox', 'flowplayer' ),
+					'ver' => false,
+					'in_footer' => false
+				)
+			);
+		}
+		
+		/**
 		 * initialize the CPT meta boxes
 		 *
 		 * @package WP Models
@@ -102,19 +282,43 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 				$txtdomain = $this->txtdomain;
 				
 			$meta = get_post_meta( $post_id, $this->metakey, true );
+			$meta = Helper_Functions::sanitize_text_field_array( $meta );
 			
 			$this->metaboxes = array(
 				new WP_Metabox(
-					'wp_models-model-details',
+					self::$slug . '-model-details',
 					__( 'Model Details', $txtdomain ),
 					null,
-					$this->slug,
+					self::$slug,
 					'side',
 					'default',
 					array (
 						'view' => 'metabox_model_details.php',
-						'model_age' => isset( $meta['model_age'] ) ? $meta['model_age'] : '' ,
+						/* 'model_age' => isset( $meta['model_age'] ) ? $meta['model_age'] : '' */
+						'meta' => $meta
 					)
+				),
+				new WP_Metabox(
+					self::$slug . '-model-pics',
+					__( 'Model Pictures', $txtdomain ),
+					null,
+					self::$slug,
+					'normal',
+					'high',
+					array (
+						'view' => 'metabox_pics_html.php'
+					) 
+				),
+				new WP_Metabox(
+					self::$slug . '-model-vids',
+					__( 'Model Videos', $txtdomain ),
+					null,
+					self::$slug,
+					'normal',
+					'high',
+					array (
+						'view' => 'metabox_vids_html.php'
+					) 
 				)
 			);
 		}
@@ -157,18 +361,162 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		 *
 		 * @package WP Models
 		 * @subpackage Custom Post Types
-		 * @param string $post_id The WP post ID.
+		 * @param string $post_data The $_POST data
 		 * @since 0.1
 		 */
-		public function save( $post_id )
+		public function save( $post_data )
 		{
-			if ( isset( $_POST['wp-models-model-age'] ) )
-				$meta['model_age'] = $_POST['wp-models-model-age'];
-				
-			if( isset( $_POST['wp-models-model-sign' ] ) )
-				$meta['model_sign'] = $_POST['wp-models-model-sign'];
+			if ( isset( $post_data['wp-models-model-age'] ) )
+				$meta['model_age'] = sanitize_text_field( $post_data['wp-models-model-age'] );
 			
-			update_post_meta( $post_id, $this->metakey, $meta );
+			if ( isset( $post_data['wp-models-model-height'] ) )
+				$meta['model_height'] = sanitize_text_field( $post_data['wp-models-model-height'] );
+			
+			if ( isset( $post_data['wp-models-model-weight'] ) )
+				$meta['model_weight'] = sanitize_text_field( $post_data['wp-models-model-weight'] );
+				
+			if ( isset( $post_data['wp-models-model-bust'] ) )
+				$meta['model_bust'] = sanitize_text_field( $post_data['wp-models-model-bust'] );
+				
+			if ( isset( $post_data['wp-models-model-waist'] ) )
+				$meta['model_waist'] = sanitize_text_field( $post_data['wp-models-model-waist'] );
+					
+			if( isset( $post_data['wp-models-model-hips' ] ) )
+				$meta['model_hips'] = sanitize_text_field( $post_data['wp-models-model-hips'] );
+			
+			update_post_meta( $post_data['post_ID'], $this->metakey, $meta );
+		}
+		
+		public function delete( $post_id )
+		{
+			//delete the media directory for this post
+		}
+		/**
+		 * Get all media of a certain type attached to the shoot.
+		 *
+		 * This function will call the appropriate content getter function based upon the $location property. This currently supports local storage as well as Amazon S3.
+		 * It will return an array containing information regarding the files present. Each item in the array will itself be an array with the following elements:
+		 * 		uri- the media item uri
+		 * 		filename- the media item filename
+		 * 		filetype- the file extension (jpg, png, etc)
+		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
+		 
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $post_id The WP post ID.
+		 * @param string $type The media type (pics, vids). This is used to determine storage location directories.
+		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
+		 * @param string $access_key The remote storage service access key.
+		 * @param string $secret_key The remote storage service secret key.
+		 * @param string $bucket The remote storage service storage location.
+		 * @return array $contents 
+		 * @since 0.1
+		 */
+		public function get_media( $post_id, $type, $location = 'local', $access_key = null, $secret_key = null , $bucket = null )
+		{
+			switch( $location ){
+				case 'amazonS3':
+					if ( is_null( $access_key ) || is_null( $secret_key) || is_null( $bucket ) )
+						return new WP_ERROR;
+					return $this->get_shoot_media_amazonS3( $post_id, $type, $access_key, $secret_key, $bucket );
+					break;
+				
+				default:	//local storage
+					return $this->get_shoot_media_local( $post_id, $type );
+					break;
+			}
+		}
+		
+		/**
+		 * Get shoot media stored locally.
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $post_id
+		 * @param string $type the media type (pics, vids)
+		 * @return array $contents An array containing the following elements:
+		 * 		uri- the media item uri
+		 * 		filename- the media item filename
+		 * 		filetype- the file extension (jpg, png, etc)
+		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
+		 * @since 0.1
+		 */
+		private function get_shoot_media_local( $post_id, $type )
+		{
+			if ( 'pics' == $type ):
+				$valid_types = array( 'png', 'jpg', 'gif' );
+			else:
+				$valid_types = array( 'mp4', 'ogv', 'webm' );
+			endif;
+			
+			$target = sprintf( '%1$s/%2$s/%3$s',
+	 			untrailingslashit( $this->media_upload_dir ),
+	 			$post_id,
+	 			$type
+	 		);
+	 		
+			if ( is_dir( $target ) ):
+				if ( $files = scandir( $target ) ):
+					foreach( $files as $entry ):
+						$filetype = wp_check_filetype( $entry );
+						if( in_array( $filetype['ext'], $valid_types ) )
+							$contents[] = array(
+								'uri' => sprintf( '%1$s/%2$s/%3$s/%4$s',
+									untrailingslashit( $this->media_upload_uri ),
+									$post_id,
+									$type,
+									$entry
+								),
+								'filename' => $entry,
+								/**
+								 * @todo Are the following two parameters needed?
+								 */
+								'filetype' => $filetype['ext'],
+								'mimetype' => $filetype['type']
+							);
+					endforeach;
+				endif;
+			endif;
+			
+			return $contents;
+		}
+		
+		/**
+		 * Save the media attached to this model
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param object $post The $_POST object.
+		 * @param object $files The $_FILES object.
+		 * @param bool $log Log the file upload. Default is false.
+		 * @since 0.1
+		 */
+		public function save_media( $post, $files, $log = false )
+		{
+			//verify the directory/subdirectories exist and have an index.php
+			Helper_Functions::create_directory( $this->media_upload_dir );
+			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] );
+			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] . '/' . $post['type'] );
+			
+			$target = sprintf( '%1$s/%2$s/%3$s',
+	 			untrailingslashit( $this->media_upload_dir ),
+	 			$post['post_id'],
+	 			$post['type']
+	 		);
+	 		
+	 		Helper_Functions::plupload( $post, $files, $target, $log );
+		}
+		
+		public function delete_media( $post_id, $media, $media_type, $location )
+		{
+			switch( $location )
+			{
+				case 'local':
+					$target = trailingslashit( $this->media_upload_dir ) . trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
+					if( file_exists( $target ) )
+						return unlink( $target );
+					break;
+			}
 		}
 		
 		/**
@@ -182,7 +530,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		public function get_models()
 		{
 			$args = array(
-				'post_type' 	=> $this->slug,
+				'post_type' 	=> self::$slug,
 				'orderby' 		=> 'title',
 				'order' 		=> 'ASC'
 			);
@@ -204,6 +552,10 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return $meta['model_age'];
+		}
+		
+		public function activate()
+		{
 		}
 	 }
 endif;
