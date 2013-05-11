@@ -20,6 +20,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 */
 	class WP_Models_CPT_Shoots_Model extends Base_CPT_Model
 	{
+		protected static $slug = 'wp-models-shoot';
 		/**
 		 * The media upload directory path
 		 *
@@ -45,42 +46,21 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 	 *
 	 	 * @package WP Models
 	 	 * @subpackage Custom Post Types
-	 	 * @param $txtdomain The plugin text domain. Used to localize the arguments.
+	 	 * @param string $uri The plugin uri.
+	 	 * @param string $txtdomain The plugin text domain. Used to localize the arguments.
 	 	 * @since 0.1
 	 	 */
-	 	public function __construct( $txtdomain )
+	 	public function __construct( $uri, $txtdomain )
 	 	{
 	 		$uploads_dir = wp_upload_dir();
 	 		
-	 		$this->slug = 'wp-models-shoot';
+	 		//$this->slug = 'wp-models-shoot';
 	 		$this->metakey = 'wp-models-shoot';
 	 		$this->shoot_model_table = 'shoot_models';
-	 		$this->init_args( $txtdomain );
-	 		$this->media_upload_dir = trailingslashit( $uploads_dir['basedir'] ) . $this->slug;
-	 		$this->media_upload_uri = trailingslashit( content_url() ) . 'uploads/' . $this->slug;
-	 		$this->admin_css = array(
-	 			array(
-	 				'handle' => 'jquery-plupload-queue',
-	 				'src' => 'plupload/jquery.plupload.queue/css/jquery.plupload.queue.css',
-	 				'deps' => false,
-	 				'ver' => false,
-	 				'media' => 'all'
-	 			),
-	 			array(
-	 				'handle' => 'shoots-cpt-admin',
-	 				'src' => 'shoots-cpt-admin.css',
-	 				'deps' => false,
-	 				'ver' => false,
-	 				'media' => 'all'
-	 			),
-	 			array(
-	 				'handle' => 'flowplayer',
-	 				'src' => 'flowplayer/functional.css',
-	 				'deps' => false,
-	 				'ver' => false,
-	 				'media' => 'all'
-	 			)
-	 		);
+	 		$this->init_args( $uri, $txtdomain );
+	 		$this->media_upload_dir = trailingslashit( $uploads_dir['basedir'] ) . self::$slug;
+	 		$this->media_upload_uri = trailingslashit( content_url() ) . 'uploads/' . self::$slug;
+	 		
 	 	}
 	 	
 	 	/**
@@ -92,7 +72,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * @see http://codex.wordpress.org/Function_Reference/register_post_type
 		 * @since 0.1
 		 */
-		protected function init_args( $txtdomain = '' )
+		protected function init_args( $uri, $txtdomain = '' )
 		{		
 			$labels = array(
 				'name'                => _x( 'Shoots', 'Post Type General Name', $txtdomain ),
@@ -121,7 +101,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 				'show_in_menu'        	=> true,
 				'show_in_nav_menus'   	=> true,
 				'show_in_admin_bar'   	=> true,
-				'menu_icon'           	=> null,
+				'menu_icon'           	=> trailingslashit( $uri ) . 'images/shoot.png',
 				'can_export'          	=> true,
 				'has_archive'         	=> true,
 				'exclude_from_search' 	=> false,
@@ -150,10 +130,10 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 			
 			$this->metaboxes = array(
 				new WP_Metabox(
-					'wp-models-shoot-models',
+					self::$slug . '-models',
 					__( 'Shoot Models', $txtdomain ),
 					null,
-					$this->slug,
+					self::$slug,
 					'side',
 					'default',
 					array (
@@ -162,25 +142,25 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 					) 
 				),
 				new WP_Metabox(
-					'wp_models-shoot-pics',
+					self::$slug . '-pics',
 					__( 'Shoot Pictures', $txtdomain ),
 					null,
-					$this->slug,
+					self::$slug,
 					'normal',
 					'high',
 					array (
-						'view' => 'metabox_shoot_pics_html.php'
+						'view' => 'metabox_pics_html.php'
 					) 
 				),
 				new WP_Metabox(
-					'wp_models-shoot-vids',
+					self::$slug . '-vids',
 					__( 'Shoot Videos', $txtdomain ),
 					null,
-					$this->slug,
+					self::$slug,
 					'normal',
 					'high',
 					array (
-						'view' => 'metabox_shoot_vids_html.php'
+						'view' => 'metabox_vids_html.php'
 					) 
 				)
 			);
@@ -226,29 +206,36 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * @subpackage Custom Post Types
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The plugin text domain.
-		 * @param string $nonce The WP nonce for security.
+		 * @param string $uri The plugin js uri.
 		 * @since 0.1
 		 */
-		protected function init_admin_scripts( $post, $txtdomain, $nonce )
+		protected function init_admin_scripts( $post, $txtdomain, $uri )
 		{			
 			$this->admin_scripts = array(
 	 			array(
 	 				'handle' => 'jquery-plupload-queue',
-	 				'src' => 'plupload/jquery.plupload.queue/jquery.plupload.queue.js',
+	 				'src' => $uri . 'plupload/jquery.plupload.queue/jquery.plupload.queue.js',
 	 				'deps' => array( 'plupload-all' ),
 	 				'ver' => '1.5.7',
 	 				'in_footer' => false
 	 			),
 	 			array(
+					'handle' => 'colorbox',
+					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox.js',
+					'deps' => array( 'jquery' ),
+					'ver' => '1.4.15',
+					'in_footer' => false
+				),
+	 			array(
 		 			'handle' => 'wp-models-cpt-shoots-admin',
-		 			'src' => 'shoots-cpt-admin.js',
-		 			'deps' => array( 'jquery-plupload-queue' ),
+		 			'src' => $uri . 'shoots-cpt-admin.js',
+		 			'deps' => array( 'jquery-plupload-queue', 'colorbox' ),
 		 			'ver' => false,
 		 			'in_footer' => true
 	 			),
 	 			array(
 	 				'handle' => 'flowplayer',
-	 				'src' => 'flowplayer/flowplayer.js',
+	 				'src' => $uri . 'flowplayer/flowplayer.js',
 	 				'deps' => array( 'jquery' ),
 	 				'ver' => '5.4.17',
 	 				'in_footer' => false
@@ -259,24 +246,65 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 				'script' => 'wp-models-cpt-shoots-admin',
 	 				'var' => 'wpModelsL10n',
 	 				'args' => array(
-	 					'storage' => 'local',
+	 					'storage' => 'local',	//deafult to local. Set later by plugin controller
 	 					'url' => admin_url( 'admin-ajax.php' ),
 	 					'post_id' => $post->ID,
-	 					'nonce' => $nonce
+	 					'post_type' => self::$slug
 	 				)
 	 			)
 	 		);
 		}
 		
 		/**
+		 * initialize the admin_css property
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $uri The uri to the plugin css directory
+		 * @since 
+		 */
+		public function init_admin_css( $uri )
+		{
+			$this->admin_css = array(
+	 			array(
+	 				'handle' => 'jquery-plupload-queue',
+	 				'src' => trailingslashit( $uri ) .  'plupload/jquery.plupload.queue/css/jquery.plupload.queue.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'shoots-cpt-admin',
+	 				'src' => trailingslashit( $uri ) .  'shoots-cpt-admin.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'flowplayer',
+	 				'src' => trailingslashit( $uri ) .  'flowplayer/functional.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'colorbox',
+	 				'src' => trailingslashit( $uri ) .  'colorbox/colorbox.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			)
+	 		);
+		}
+		/**
 		 * Save the shoot cpt meta.
 		 *
 		 * @package WP Models
 		 * @subpackage Custom Post Types
-		 * @param string $post_id The WP post ID.
+		 * @param string $post_data The $_POST data.
 		 * @since 0.1
 		 */
-		public function save( $post_id )
+		public function save( $post_data )
 		{
 			global $wpdb;
 		
@@ -288,7 +316,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 			         DELETE FROM $db_table_name
 					 WHERE shoot_id = %d
 					",
-				        $post_id
+				        $post_data['post_ID']
 			        )
 			);
 			
@@ -299,7 +327,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 						$wpdb->prefix . $this->shoot_model_table, 
 						array( 
 							'model_id' => $model, 
-							'shoot_id' => $post_id 
+							'shoot_id' => $post_data['post_ID'] 
 						), 
 						array( 
 							'%d', 
@@ -308,6 +336,11 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 					);
 				endforeach;
 			endif;
+		}
+		
+		public function delete( $post_id )
+		{
+			//delete all media uploaded for this shoot
 		}
 		
 		/**
@@ -390,21 +423,18 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * @return array $contents 
 		 * @since 0.1
 		 */
-		public function get_shoot_media( $post_id, $type, $location = 'local', $access_key = null, $secret_key = null , $bucket = null )
+		public function get_media( $post_id, $type, $location = 'local', $access_key = null, $secret_key = null , $bucket = null )
 		{
 			switch( $location ){
-				case 'local':
-					return $this->get_shoot_media_local( $post_id, $type );
-					break;
 				case 'amazonS3':
 					if ( is_null( $access_key ) || is_null( $secret_key) || is_null( $bucket ) )
 						return new WP_ERROR;
 					return $this->get_shoot_media_amazonS3( $post_id, $type, $access_key, $secret_key, $bucket );
 					break;
 				
-				default:
-					//no storage location selected, so exit
-					return;
+				default:	//local storage
+					return $this->get_shoot_media_local( $post_id, $type );
+					break;
 			}
 		}
 		
@@ -530,15 +560,33 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * @param bool $log Log the file upload. Default is false.
 		 * @since 0.1
 		 */
-		public function save_shoot_media( $post, $files, $log = false )
-		{	
+		public function save_media( $post, $files, $log = false )
+		{
+			//verify the target directory/subdirectories exist and have an index.php
+			Helper_Functions::create_directory( $this->media_upload_dir );
+			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] );
+			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] . '/' . $post['type'] );
+			
 			$target = sprintf( '%1$s/%2$s/%3$s',
 	 			untrailingslashit( $this->media_upload_dir ),
 	 			$_POST['post_id'],
 	 			$_POST['type']
 	 		);
+	 		print_r( explode( '/', $target ) );
 	 		
 	 		Helper_Functions::plupload( $_POST, $_FILES, $target, $log );
+		}
+		
+		public function delete_media( $post_id, $media, $media_type, $location )
+		{
+			switch( $location )
+			{
+				case 'local':
+					$target = trailingslashit( $this->media_upload_dir ) . trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
+					if( file_exists( $target ) )
+						return unlink( $target );
+					break;
+			}
 		}
 		
 		/**
@@ -575,7 +623,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * @subpackage subtoken
 		 * @since 0.1
 		 */
-		 public function delete()
+		 public function delete_plugin()
 		 {
 		 	global $wpdb;
 			
