@@ -10,7 +10,6 @@
  * @version 0.1
  * @since 0.1
  */
- 
 echo $nonce;
 foreach( $metabox['args']['models'] as $key => $model ):
 	if( is_array( $metabox['args']['shoot_models'] ) )
