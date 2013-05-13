@@ -1,23 +1,21 @@
 <?php
 /**
- * File Description
+ * The main WP-Models plugin file.
  *
- * @package pkgtoken
- * @subpackage subtoken
- * @author authtoken
- * @version
- * @since
+ * @package WP Models
+ * @author ActionHook <plugins@actionhook.com>
+ * @version 0.1
  */
 
 /*
 Plugin Name: WP Models
-Plugin URI: http://wp-models.com
-Description: A plugin to add models and photo shoots.
+Plugin URI: http://actionhook.com/wp-models
+Description: A plugin to add models and photo shoots. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.
 Version: 0.1
-Author: Daryl Lozupone
+Author: ActionHook <plugins@actionhook.com>
 License: GPL2
  
- Copyright 2013  Daryl Lozupone  (email : dlozupone@renegadetechconsulting.com)
+ Copyright 2013  ActionHook.com  (email : plugin@actionhook.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -33,6 +31,14 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+//check for server requirements
+if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
+    // php version isn't high enough
+    add_action( 'admin_notice', 'wp_models_fail_php_check' );
+    die();
+}
+
+
 //include our base classes
 require_once( 'base/helper.php' );
 require_once( 'base/controllers/base_controller_plugin.php' );
@@ -44,4 +50,13 @@ require_once( 'app/controllers/plugin_controller.php' );
 $WP_Models = new WP_Models( 'wp-models', '0.1', plugin_dir_path( __FILE__ ), __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
 
 require_once( 'wp-models-template-tags.php' );
+
+
+function wp_models_fail_php_check() {
+?>
+<div class="error">
+	<p><?php __( 'WP-Models requires PHP5.3 or higher. Please contact your host to upgrade your web server.', 'wp-models' ); ?></p>
+</div>
+<?php
+}
 ?>
