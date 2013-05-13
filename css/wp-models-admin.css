@@ -3,6 +3,10 @@
 	background: url(../images/shoot-32x32.png) no-repeat;
 }
 
+#icon-edit.icon32-posts-wp-models-model {
+	background: url(../images/model-32x32.png) no-repeat;
+}
+
 .wp-models-media-container
 {
 	clear: both;
