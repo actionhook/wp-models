@@ -208,7 +208,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 			),
 	 			array(
 	 				'handle' => 'wp-models-admin',
-	 				'src' => $uri .  'wp-models.admin.css',
+	 				'src' => $uri .  'wp-models-admin.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'

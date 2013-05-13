@@ -275,7 +275,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 			),
 	 			array(
 	 				'handle' => 'wp-models-admin',
-	 				'src' => trailingslashit( $uri ) .  'wp-models.admin.css',
+	 				'src' => trailingslashit( $uri ) .  'wp-models-admin.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
