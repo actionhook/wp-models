@@ -34,28 +34,27 @@ License: GPL2
 //check for server requirements
 if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
     // php version isn't high enough
-    add_action( 'admin_notice', 'wp_models_fail_php_check' );
-    die();
+    add_action( 'admin_notices', 'wp_models_fail_php_check' );
+} else {
+
+
+	//include our base classes
+	require_once( 'base/helper.php' );
+	require_once( 'base/controllers/base_controller_plugin.php' );
+	require_once( 'base/models/base_model_metabox.php' );
+	require_once( 'base/models/base_model_cpt.php' );
+	
+	require_once( 'app/controllers/plugin_controller.php' );
+	
+	$WP_Models = new WP_Models( 'wp-models', '0.1', plugin_dir_path( __FILE__ ), __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
+	
+	require_once( 'wp-models-template-tags.php' );
 }
-
-
-//include our base classes
-require_once( 'base/helper.php' );
-require_once( 'base/controllers/base_controller_plugin.php' );
-require_once( 'base/models/base_model_metabox.php' );
-require_once( 'base/models/base_model_cpt.php' );
-
-require_once( 'app/controllers/plugin_controller.php' );
-
-$WP_Models = new WP_Models( 'wp-models', '0.1', plugin_dir_path( __FILE__ ), __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
-
-require_once( 'wp-models-template-tags.php' );
-
 
 function wp_models_fail_php_check() {
 ?>
 <div class="error">
-	<p><?php __( 'WP-Models requires PHP5.3 or higher. Please contact your host to upgrade your web server.', 'wp-models' ); ?></p>
+	<p><?php _e( 'WP-Models requires PHP5.3 or higher. Please contact your host to upgrade your web server.', 'wp-models' ); ?></p>
 </div>
 <?php
 }
