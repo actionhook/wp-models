@@ -20,7 +20,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 class WP_Models_CPT_Models_Model extends Base_CPT_Model
 	 {
 	 	protected static $slug = 'wp-models-model';
-	 	
+	 	protected static $metakey = '_wp-models-model';
 	 	/**
 		 * The media upload directory path
 		 *
@@ -54,9 +54,9 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 		$uploads_dir = wp_upload_dir();
 	 		
 	 		//self::$slug = 'wp-models-model';
-	 		$this->noncename = 'wp-models-model';
-	 		$this->metakey = '_wp-models-model';
+	 		/* $this->noncename = 'wp-models-model'; */
 	 		$this->init_args( $uri, $txtdomain );
+	 		$this->init_shortcodes();
 	 		$this->media_upload_dir = trailingslashit( $uploads_dir['basedir'] ) . self::$slug;
 	 		$this->media_upload_uri = trailingslashit( content_url() ) . 'uploads/' . self::$slug;
 	 	}
@@ -102,7 +102,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 				'show_in_menu'        	=> true,
 				'show_in_nav_menus'   	=> true,
 				'show_in_admin_bar'   	=> true,
-				'menu_icon'           	=> null,
+				'menu_icon'           	=> trailingslashit( $uri ) . 'images/model-icon.png',
 				'can_export'          	=> true,
 				'has_archive'         	=> true,
 				'exclude_from_search' 	=> false,
@@ -111,6 +111,25 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 			);
 		}
 		
+		/**
+		 * Description
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @since 
+		 */
+		public function init_shortcodes()
+		{
+			$this->shortcodes = array(
+				'wpmodelsmodelinfo' => array( &$this, 'wp_models_model_info' ),
+				'wpmodelsmodelage' => array( &$this, 'wp_models_model_age' ),
+				'wpmodelsmodelheight' => array( &$this, 'wp_models_model_height' ),
+				'wpmodelsmodelweight' => array( &$this, 'wp_models_model_weight' ),
+				'wpmodelsmodelbust' => array( &$this, 'wp_models_model_bust' ),
+				'wpmodelsmodelwaist' => array( &$this, 'wp_models_model_waist' ),
+				'wpmodelsmodelhips' => array( &$this, 'wp_models_model_hips' )
+			);
+		}
 		/**
 		 * Initialize the admin_scripts property.
 		 *
@@ -132,8 +151,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 				'in_footer' => false
 	 			),
 	 			array(
-		 			'handle' => 'wp-models-cpt-shoots-admin',
-		 			'src' => $uri . 'shoots-cpt-admin.js',
+		 			'handle' => 'wp-models-admin-cpt',
+		 			'src' => $uri . 'wp-models-admin-cpt.js',
 		 			'deps' => array( 'jquery-plupload-queue' ),
 		 			'ver' => false,
 		 			'in_footer' => true
@@ -155,7 +174,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 		);
 	 		$this->admin_scripts_l10n = array(
 	 			array(
-	 				'script' => 'wp-models-cpt-shoots-admin',
+	 				'script' => 'wp-models-admin-cpt',
 	 				'var' => 'wpModelsL10n',
 	 				'args' => array(
 	 					'storage' => 'local',	//deafult to local. Set later by plugin controller
@@ -188,8 +207,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 	 				'media' => 'all'
 	 			),
 	 			array(
-	 				'handle' => 'shoots-cpt-admin',
-	 				'src' => $uri .  'shoots-cpt-admin.css',
+	 				'handle' => 'wp-models-admin',
+	 				'src' => $uri .  'admin.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
@@ -215,8 +234,8 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		{
 			$this->css = array(
 	 			array(
-	 				'handle' => 'wp-models-models',
-	 				'src' => trailingslashit( $uri ) .  'models.css',
+	 				'handle' => 'wp-models',
+	 				'src' => trailingslashit( $uri ) .  'wp-models.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
@@ -257,7 +276,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 				),
 				array(
 					'handle' => 'wp-models-single-model',
-					'src' => trailingslashit( $uri ) . 'single-model.js',
+					'src' => trailingslashit( $uri ) . 'wp-models-single.js',
 					'deps' => array( 'colorbox', 'flowplayer' ),
 					'ver' => false,
 					'in_footer' => false
@@ -281,7 +300,7 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 			if ( $txtdomain = '' and isset( $this->txtdomain ) )
 				$txtdomain = $this->txtdomain;
 				
-			$meta = get_post_meta( $post_id, $this->metakey, true );
+			$meta = get_post_meta( $post_id, self::$metakey, true );
 			$meta = Helper_Functions::sanitize_text_field_array( $meta );
 			
 			$this->metaboxes = array(
@@ -384,13 +403,41 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 			if( isset( $post_data['wp-models-model-hips' ] ) )
 				$meta['model_hips'] = sanitize_text_field( $post_data['wp-models-model-hips'] );
 			
-			update_post_meta( $post_data['post_ID'], $this->metakey, $meta );
+			update_post_meta( $post_data['post_ID'], self::$metakey, $meta );
 		}
 		
 		public function delete( $post_id )
 		{
 			//delete the media directory for this post
 		}
+		
+		
+		/**
+		 * Get the model meta info
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $post_id The WP post id
+		 * @return string $info The model meta info
+		 * @since 0.1
+		 */
+		public static function get_info( $post_id)
+		{
+			$meta = get_post_meta( $post_id, self::$metakey, true );
+			
+			//create the info string from meta keys/values
+			if( is_array( $meta ) ):
+				foreach( $meta as $key => $item ):
+					$info .= ucfirst( str_replace('model_', '', $key ) ) . ': ' . $item . ' ';			
+				endforeach;
+			endif;
+			
+			//allow the end user to filter the info line
+			$info = apply_filters( 'wp_models_filter_model_info', $info, $post_id, $meta );
+			
+			return $info;
+		}
+		
 		/**
 		 * Get all media of a certain type attached to the shoot.
 		 *
@@ -548,10 +595,181 @@ if ( ! class_exists( WP_Models_CPT_Models_Model ) ):
 		 * @param string $model_id The WP post ID for this model.
 		 * @since 0.1
 		 */
-		public function get_model_age( $model_id )
+		public static function get_model_age( $model_id )
 		{
-			$meta =  get_post_meta( $model_id, $this->metakey, true );
-			return $meta['model_age'];
+			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			return sanitize_text_field( $meta['model_age'] );
+		}
+		
+		/**
+		 * Get a model's height
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $model_id The WP post ID for this model.
+		 * @since 0.1
+		 */
+		public static function get_model_height( $model_id )
+		{
+			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			return sanitize_text_field( $meta['model_height'] );
+		}
+		/**
+		 * Get a model's weight
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $model_id The WP post ID for this model.
+		 * @since 0.1
+		 */
+		public static function get_model_weight( $model_id )
+		{
+			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			return sanitize_text_field( $meta['model_weight'] );
+		}
+		/**
+		 * Get a model's bust measurement
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $model_id The WP post ID for this model.
+		 * @since 0.1
+		 */
+		public static function get_model_bust( $model_id )
+		{
+			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			return sanitize_text_field( $meta['model_bust'] );
+		}
+		/**
+		 * Get a model's waist measurement
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $model_id The WP post ID for this model.
+		 * @since 0.1
+		 */
+		public static function get_model_waist( $model_id )
+		{
+			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			return sanitize_text_field( $meta['model_waist'] );
+		}
+		/**
+		 * Get a model's hips measurement
+		 *
+		 * @package WP Models
+		 * @subpackage Custom Post Types
+		 * @param string $model_id The WP post ID for this model.
+		 * @since 0.1
+		 */
+		public static function get_model_hips( $model_id )
+		{
+			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			return sanitize_text_field( $meta['model_hips'] );;
+		}
+		
+		/**
+		 * The wp_models_model_age shortcode handler
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param array $args The shortcode arguments.
+		 * @return string The model age.
+		 * @since 0.1
+		 */
+		public function wp_models_model_info( $args )
+		{
+			global $post;
+			return self::get_info( $post->ID );
+		}
+		
+		/**
+		 * The wp_models_model_age shortcode handler
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param array $args The shortcode arguments.
+		 * @return string The model age.
+		 * @since 0.1
+		 */
+		public function wp_models_model_age( $args )
+		{
+			global $post;
+			return self::get_model_age( $post->ID );
+		}
+		
+		/**
+		 * The wp_models_model_height shortcode handler
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param array $args The shortcode arguments.
+		 * @return string The model height.
+		 * @since 0.1
+		 */
+		public function wp_models_model_height( $args )
+		{
+			global $post;
+			return self::get_model_height( $post->ID );
+		}
+		
+		/**
+		 * The wp_models_model_weight shortcode handler
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param array $args The shortcode arguments.
+		 * @return string The model weight.
+		 * @since 0.1
+		 */
+		public function wp_models_model_weight( $args )
+		{
+			global $post;
+			return self::get_model_weight( $post->ID );
+		}
+		
+		/**
+		 * The wp_models_model_bust shortcode handler
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param array $args The shortcode arguments.
+		 * @return string The model bust measurement.
+		 * @since 0.1
+		 */
+		public function wp_models_model_bust( $args )
+		{
+			global $post;
+			return self::get_model_bust( $post->ID );
+		}
+		
+		/**
+		 * The wp_models_model_waist shortcode handler
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param array $args The shortcode arguments.
+		 * @return string The model waist measurement.
+		 * @since 0.1
+		 */
+		public function wp_models_model_waist( $args )
+		{
+			global $post;
+			return self::get_model_waist( $post->ID );
+		}
+		
+		/**
+		 * The wp_models_model_hips shortcode handler
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param array $args The shortcode arguments.
+		 * @return string $age The model age.
+		 * @since 0.1
+		 */
+		public function wp_models_model_hips( $args )
+		{
+			global $post;
+			return self::get_model_hips( $post->ID );
 		}
 		
 		public function activate()
