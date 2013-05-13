@@ -221,14 +221,14 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 			),
 	 			array(
 					'handle' => 'colorbox',
-					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox.js',
+					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox-min.js',
 					'deps' => array( 'jquery' ),
 					'ver' => '1.4.15',
 					'in_footer' => false
 				),
 	 			array(
-		 			'handle' => 'wp-models-cpt-shoots-admin',
-		 			'src' => $uri . 'shoots-cpt-admin.js',
+		 			'handle' => 'wp-models-admin-cpt',
+		 			'src' => $uri . 'wp-models-admin-cpt.js',
 		 			'deps' => array( 'jquery-plupload-queue', 'colorbox' ),
 		 			'ver' => false,
 		 			'in_footer' => true
@@ -243,7 +243,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 		);
 	 		$this->admin_scripts_l10n = array(
 	 			array(
-	 				'script' => 'wp-models-cpt-shoots-admin',
+	 				'script' => 'wp-models-admin-cpt',
 	 				'var' => 'wpModelsL10n',
 	 				'args' => array(
 	 					'storage' => 'local',	//deafult to local. Set later by plugin controller
@@ -274,8 +274,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 				'media' => 'all'
 	 			),
 	 			array(
-	 				'handle' => 'shoots-cpt-admin',
-	 				'src' => trailingslashit( $uri ) .  'shoots-cpt-admin.css',
+	 				'handle' => 'wp-models-admin',
+	 				'src' => trailingslashit( $uri ) .  'admin.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
@@ -296,6 +296,76 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 			)
 	 		);
 		}
+		
+		/**
+		 * Initialize the frontend js
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @since 
+		 */
+		public function init_scripts( $uri )
+		{
+			$this->scripts = array(
+				array(
+					'handle' => 'colorbox',
+					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox.js',
+					'deps' => array( 'jquery' ),
+					'ver' => '1.4.15',
+					'in_footer' => false
+				),
+				array(
+					'handle' => 'flowplayer',
+					'src' => trailingslashit( $uri ) . 'flowplayer/flowplayer.min.js',
+					'deps' => array( 'jquery' ),
+					'ver' => '5.4.1',
+					'in_footer' => false
+				),
+				array(
+					'handle' => 'wp-models-single-model',
+					'src' => trailingslashit( $uri ) . 'wp-models-single.js',
+					'deps' => array( 'colorbox', 'flowplayer' ),
+					'ver' => false,
+					'in_footer' => false
+				)
+			);
+		}
+		
+		/**
+		 * Initialize the frontend css
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $uri The plugin css uri
+		 * @since 0.1
+		 */
+		public function init_css( $uri )
+		{
+			$this->css = array(
+	 			array(
+	 				'handle' => 'wp-models',
+	 				'src' => trailingslashit( $uri ) .  'wp-models.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'colorbox',
+	 				'src' => trailingslashit( $uri ) .  'colorbox/colorbox.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			),
+	 			array(
+	 				'handle' => 'flowplayer',
+	 				'src' => trailingslashit( $uri ) .  'flowplayer/minimalist.css',
+	 				'deps' => false,
+	 				'ver' => false,
+	 				'media' => 'all'
+	 			)
+	 		);
+		}
+		
 		/**
 		 * Save the shoot cpt meta.
 		 *
@@ -403,6 +473,52 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		}
 		
 		/**
+		 * Get the shoot meta info line
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @param string $post_id The WP post id
+		 * @return string $info The shoot meta info
+		 * @since 0.1
+		 */
+		public function get_info( $post_id )
+		{
+			global $post;
+			
+			$shoot_models = $this->get_shoot_models( $post_id );
+			
+			//loop through shoot_models array to retrieve model name
+			foreach( $shoot_models as $model_id ):
+				$model_post = get_post( $model_id );
+				$model_names[] = $model_post->post_title;
+			endforeach;
+			
+			//sort the array alphabetically
+			sort( $model_names );
+			
+			//generate the text string ( Model 1, Model 2, ...)
+			foreach( $model_names as $key => $model ):
+				$models .= $key > 0 ? ', ' : '';
+				$models .= $model;
+			endforeach;
+			
+			$info = sprintf( __( 'Shot on %s with %s', $txtdomain ),
+				date_i18n( get_option( 'date_format'), strtotime( $post->post_date ) ),
+				$models
+			);
+			
+			//create meta info array for the filter
+			$meta = array(
+				'date' => $post->post_date,
+				'models' =>  $model_names
+			);
+			
+			$info = apply_filters( 'wp_models_filter_shoot_info', $info, $post_id, $meta );
+			
+			return $info;
+		}
+		
+		/**
 		 * Get all media of a certain type attached to the shoot.
 		 *
 		 * This function will call the appropriate content getter function based upon the $location property. This currently supports local storage as well as Amazon S3.
@@ -454,7 +570,6 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 */
 		private function get_shoot_media_local( $post_id, $type )
 		{
-			print( "LOCAL" );
 			if ( 'pics' == $type ):
 				$valid_types = array( 'png', 'jpg', 'gif' );
 			else:
@@ -480,9 +595,6 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 									$entry
 								),
 								'filename' => $entry,
-								/**
-								 * @todo Are the following two parameters needed?
-								 */
 								'filetype' => $filetype['ext'],
 								'mimetype' => $filetype['type']
 							);
@@ -572,9 +684,8 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 			$_POST['post_id'],
 	 			$_POST['type']
 	 		);
-	 		print_r( explode( '/', $target ) );
 	 		
-	 		Helper_Functions::plupload( $_POST, $_FILES, $target, $log );
+	 		return( Helper_Functions::plupload( $_POST, $_FILES, $target, $log ) );
 		}
 		
 		public function delete_media( $post_id, $media, $media_type, $location )
