@@ -13,7 +13,7 @@ function togglePanel() {
 
 function wp_models_init_colorbox()
 {
-	jQuery('a.wp-models-model-gallery').colorbox({
+	jQuery('a.wp-models-gallery').colorbox({
 		rel: 'group1',
 		maxWidth:'95%',
 		maxHeight:'95%'
