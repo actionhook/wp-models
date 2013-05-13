@@ -9,24 +9,24 @@
  * @since 0.1
  */
 ?>
-<p class="wp-models-model-info"><?php echo $model_info; ?></p>
+<p class="<?php echo $post->post_type; ?>-info"><?php echo $info; ?></p>
 <div class="wp-models-toggle-container">
-	<div class="wp-models-model-content"><?php echo $content; ?></div>
+	<div class="<?php echo $post->post_type; ?>-content"><?php echo $content; ?></div>
 </div>
 
 <?php if( is_array( $post_pics ) ): ?>
-	<div class="wp-models-model-pics">
+	<div class="<?php echo $post->post_type; ?>-pics">
 		<h3><?php the_title() ?> Pictures</h3>
 		<?php foreach( $post_pics as $pic ):?>
-			<a href="<?php echo $pic['uri']; ?>" class="wp-models-model-gallery" title="<?php the_title(); ?>"><img src="<?php echo $pic['uri']; ?>" class="wp-models-model-pic" /></a>
+			<a href="<?php echo $pic['uri']; ?>" class="wp-models-gallery" title="<?php the_title(); ?>"><img src="<?php echo $pic['uri']; ?>" class="<?php echo $post->post_type; ?>-pic" /></a>
 		<?php endforeach; ?>
 		<div style="clear: both;"></div>
 	</div>
 <?php endif; ?>
 <?php if( is_array( $post_vids ) ):?>
-	<div class="wp-models-model-vids">
+	<div class="<?php echo $post->post_type; ?>-vids">
 		<h3><?php the_title() ?> Videos</h3>
-		<div class="wp-models-model-vid is-splash color-light">
+		<div class="<?php echo $post->post_type; ?>-vid is-splash color-light">
 		<?php foreach( $post_vids as $vid ):?>
 			<video>
 				<source type="<?php echo $vid['mimetype']; ?>" src="<?php echo $vid['uri']; ?>" />
