@@ -26,7 +26,7 @@ if ( ! class_exists( WP_Models ) ):
 	 	 * @since 0.1
 	 	 */
 	 	public function init()
-	 	{
+	 	{	
 	 		//require necessary files
 	 		require_once( $this->models_path . '/model_cpt_models.php' );
 	 		require_once( $this->models_path . '/model_cpt_shoots.php' );
@@ -60,13 +60,13 @@ if ( ! class_exists( WP_Models ) ):
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_vid', 	array( &$this, 'ajax_delete_media' ) );
 	 		
 	 		//filter js l10n as necessary
-	 		add_filter( 'filter_admin_scripts_l10n_args-wp-models-cpt-shoots-admin',	array( &$this, 'filter_shoot_cpt_admin_js' ), 10 );
+	 		add_filter( 'ah_base_filter_admin_scripts_l10n_args-wp-models-admin-cpt',	array( &$this, 'filter_shoot_cpt_admin_js' ), 10 );
 	 		
 	 		// Support the file format webm mimetype
 			add_filter( 'upload_mimes', array( &$this, 'custom_mimes' ) );
 			
 			//add our content filters
-			add_filter( 'the_content',	array( &$this, 'render_model_single' ) );
+			add_filter( 'the_content',	array( &$this, 'render_single_view' ) );
 	 	}
 	 	
 	 	/**
@@ -109,7 +109,7 @@ if ( ! class_exists( WP_Models ) ):
 	 			die( 'NONCE CHECK FAILED' );
 		
 	 		$result = $this->cpts[$_POST['post_type']]->save_media( $_POST, $_FILES, true );
-	 		print_r( $_POST);
+	 		//print_r( $_POST);
 	 		die( $result );
 	 	}
 	 	
@@ -156,9 +156,9 @@ if ( ! class_exists( WP_Models ) ):
 	 		
 	 		if ( $html == '' ):
 	 			if ( $_POST['media_type'] == 'pics' ):
-	 				$html = __( 'There are no pictures associated with this .', $this->txtdomain );
+	 				$html = __( 'There are no pictures associated with this post.', $this->txtdomain );
 	 			else:
-	 				$html = __( 'There are no videos associated with this .', $this->txtdomain );
+	 				$html = __( 'There are no videos associated with this post.', $this->txtdomain );
 	 			endif;
 	 		endif;
 	 		
@@ -276,7 +276,7 @@ if ( ! class_exists( WP_Models ) ):
 		}
 		
 		/**
-		 * Render the single model page view.
+		 * Render the single cpt page view.
 		 *
 		 * This view is rendered using the WP filter the_content. This is done to ensure compatibility with all themes and membership plugins.
 		 *
@@ -284,12 +284,13 @@ if ( ! class_exists( WP_Models ) ):
 		 * @subpackage subtoken
 		 * @param string $content The WP post content.
 		 * @since 0.1
+		 * @todo Modfiy this function to allow for end user views in their theme directory
 		 */
-		public function render_model_single( $content )
+		public function render_single_view( $content )
 		{
 			global $post;
 			
-			if( is_single() && $post->post_type == $this->cpts[$post->post_type]->get_slug() ):
+			if( is_single() && isset ( $this->cpts[$post->post_type] ) ):
 				$settings = $this->settings->get_storage_settings();
 	 		
 		 		if( $settings['location'] == 'amazonS3' )
@@ -314,22 +315,12 @@ if ( ! class_exists( WP_Models ) ):
 					$settings['$bucket']
 				);
 				
-				//get the model details
-				$meta = get_post_meta( $post->ID, $this->cpts[_WP_MODELS_CPT_MODELS_SLUG]->get_metakey(), true );
-				
-				//create the info string from meta keys/values
-				if( is_array( $meta ) ):
-					foreach( $meta as $key => $item ):
-						$model_info .= ucfirst( str_replace('model_', '', $key ) ) . ': ' . $item . ' ';			
-					endforeach;
-				endif;
-				
-				//allow the end user to filter the info line
-				$model_info = apply_filters( 'wp_models_filter_model_info', $model_info, $post->ID, $meta );
+				//add additional view variables
+				$info = $this->cpts[$post->post_type]->get_info( $post->ID );
 				
 				//include the view
 				ob_start();
-				require_once( trailingslashit( $this->views_path ) . 'single_model.php' );
+				require_once( trailingslashit( $this->views_path ) . 'wp-models-cpt-single.php' );
 				$content = ob_get_clean();
 			endif;
 			
