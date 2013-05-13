@@ -14,9 +14,9 @@
 ?>
 <div id="<?php echo $metabox['id']; ?>-uploader-container">
 	<h4><?php _e( 'Upload Vids:', $txtdomain );?></h4>
-	<p><?php _e( 'Valid file formats include', $txtdomain);?>: mp4, webm, ogv</p>
+	<p><?php _e( 'The maximum file upload size is 600MB. Valid file formats include', $txtdomain);?>: mp4, webm, ogv</p>
 	<span class="wp-models-toggle">Toggle</span>
-	<div id='<?php echo $metabox['id']; ?>-uploader' class='wp-models-plupload wp-models-vids-uploader'><?php _e( 'Your browser does not support HTML 5, Flash ,Silverlight, or HTML 4.', $txtdomain ); ?></div>
+	<div id='<?php echo $metabox['id']; ?>-uploader' class='wp-models-plupload wp-models-vids-uploader'><?php _e( 'Your browser does not support HTML5, Silverlight, or Flash.', $txtdomain ); ?></div>
 </div>
 <!--
 <div id="basic-playlist" class="wp-models-player is-splash is-closeable" data-ratio="0.56">
