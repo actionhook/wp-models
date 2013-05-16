@@ -45,8 +45,7 @@ if ( ! class_exists( WP_Models_Settings_Model ) ):
 				'wp-models-general' => array(
 					'title' => __( 'General Settings', $txtdomain ),
 					'callback' => null,
-					'page' => 'wp-models-options',
-					'content' => 'The general settings, bro.'
+					'page' => 'wp-models-options'
 				)
 			);
 			
