@@ -16,7 +16,7 @@ if ( ! class_exists( WP_Models ) ):
 	 * @since WP Models 0.1
 	 * @todo add activate function that creates db table
 	 */
-	 class WP_Models extends Base_Plugin_Controller
+	 class WP_Models extends Base_Controller_Plugin
 	 {
 	 	/**
 	 	 * Initialize the plugin
@@ -26,25 +26,24 @@ if ( ! class_exists( WP_Models ) ):
 	 	 * @since 0.1
 	 	 */
 	 	public function init()
-	 	{	
+	 	{
 	 		//require necessary files
-	 		require_once( $this->models_path . '/model_cpt_models.php' );
-	 		require_once( $this->models_path . '/model_cpt_shoots.php' );
+	 		require_once( $this->app_models_path . '/model_cpt_models.php' );
+	 		require_once( $this->app_models_path . '/model_cpt_shoots.php' );
+	 		require_once( $this->app_models_path . '/model_settings.php' );
 	 		
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
 	 		define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
 	 			
 	 		//get the plugin settings
-	 		require_once( $this->models_path . '/model_settings.php' );
-	 		$this->settings = new WP_Models_Settings_Model();
+	 		$this->settings_model = new WP_Models_Settings_Model( $this->txtdomain );
+			//print_r( $this->settings_model );
 			
 	 		//set up the plugin custom post types
 	 		$this->cpts = array(
 	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain ),
 	 			_WP_MODELS_CPT_SHOOTS_SLUG => new WP_Models_CPT_Shoots_Model( $this->uri, $this->txtdomain )
 	 		);
-	 		
-	 		//print_r($this->cpts);
 	 		
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
@@ -60,13 +59,14 @@ if ( ! class_exists( WP_Models ) ):
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_vid', 	array( &$this, 'ajax_delete_media' ) );
 	 		
 	 		//filter js l10n as necessary
-	 		add_filter( 'ah_base_filter_admin_scripts_l10n_args-wp-models-admin-cpt',	array( &$this, 'filter_shoot_cpt_admin_js' ), 10 );
+	 		add_filter( 'ah_base_filter_admin_scripts_l10n_args-wp-models-admin-cpt',	array( &$this, 'filter_admin_cpt_js' ), 10 );
 	 		
-	 		// Support the file format webm mimetype
+	 		//Add additional mimetypes for video uploads
 			add_filter( 'upload_mimes', array( &$this, 'custom_mimes' ) );
 			
-			//add our content filters
-			add_filter( 'the_content',	array( &$this, 'render_single_view' ) );
+			//add content filters if so desired
+			if ( $this->settings_model->settings['wp_models_general']['use_filter'] )
+				add_filter( 'the_content',	array( &$this, 'render_single_view' ) );
 	 	}
 	 	
 	 	/**
@@ -150,7 +150,7 @@ if ( ! class_exists( WP_Models ) ):
 			//if we have an array of media items, include the appropriate view
 	 		if ( is_array( $post_media ) ):
 		 		ob_start();
-		 		require_once( trailingslashit( $this->views_path ) . 'admin_ajax_'. $_POST['media_type'] . '_html.php' );
+		 		require_once( trailingslashit( $this->app_views_path ) . 'admin_ajax_'. $_POST['media_type'] . '_html.php' );
 		 		$html = ob_get_clean();
 	 		endif;
 	 		
@@ -202,6 +202,7 @@ if ( ! class_exists( WP_Models ) ):
 	 	public function custom_mimes( $mimes )
 	 	{
 			$mimes['webm'] = 'video/webm';
+			$mimes['ogv'] = 'video/ogv';
 			return $mimes;
 		}
 		
@@ -291,28 +292,34 @@ if ( ! class_exists( WP_Models ) ):
 			global $post;
 			
 			if( is_single() && isset ( $this->cpts[$post->post_type] ) ):
-				$settings = $this->settings->get_storage_settings();
+				/*
+$settings = $this->settings->get_storage_settings();
 	 		
 		 		if( $settings['location'] == 'amazonS3' )
 		 			require_once( trailingslashit( $this->path) . 'lib/s3.php' );
+*/
 				
 				//get the post media
 				$post_pics = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
-					'pics',
+					'pics'/*
+,
 					$settings['location'],
 					$settings['access_key'],
 					$settings['secret_key'],
 					$settings['$bucket']
+*/
 				);
 				
 				$post_vids = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
-					'vids',
+					'vids'/*
+,
 					$settings['location'],
 					$settings['access_key'],
 					$settings['secret_key'],
 					$settings['$bucket']
+*/
 				);
 				
 				//add additional view variables
@@ -320,14 +327,21 @@ if ( ! class_exists( WP_Models ) ):
 				
 				//include the view
 				ob_start();
-				require_once( trailingslashit( $this->views_path ) . 'wp-models-cpt-single.php' );
+				require_once( trailingslashit( $this->app_views_path ) . 'wp-models-cpt-single.php' );
 				$content = ob_get_clean();
 			endif;
 			
 			return $content;
 		}
 		
-		
+		/**
+		 * Description
+		 *
+		 * @package pkgtoken
+		 * @subpackage subtoken
+		 * @since 
+		 * @todo add routine to set the default settings
+		 */
 		public static function activate()
 		{
 		}
