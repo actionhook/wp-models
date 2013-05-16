@@ -10,12 +10,12 @@
 /*
 Plugin Name: WP Models
 Plugin URI: http://actionhook.com/wp-models
-Description: A plugin to add models and photo shoots. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.
+Description: A plugin to add models and photo shoots. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
 Version: 0.1
 Author: ActionHook <plugins@actionhook.com>
 License: GPL2
  
- Copyright 2013  ActionHook.com  (email : plugin@actionhook.com)
+ Copyright 2013  ActionHook.com  (email : plugins@actionhook.com)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -43,6 +43,7 @@ if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
 	require_once( 'base/controllers/base_controller_plugin.php' );
 	require_once( 'base/models/base_model_metabox.php' );
 	require_once( 'base/models/base_model_cpt.php' );
+	require_once( 'base/models/base_model_settings.php' );
 	
 	require_once( 'app/controllers/plugin_controller.php' );
 	
