@@ -2,7 +2,7 @@
 /**
  * The Shoots Custom Post Type
  *
- * @package WP Models\Models\Shoots CPT
+ * @package WP Models\Models
  * @author ActionHook.com <plugins@actionhook.com>
  * @since WP Models 0.1
  */
@@ -26,7 +26,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	/**
 	 * The WP Models Shoots CPT Model
 	 *
-	 * @package WP Models\Models\Shoots CPT
+	 * @package WP Models\Models
 	 * @version 0.1
 	 * @since WP Models 0.1
 	 * @todo Add Rackspace CloudFiles support
@@ -37,7 +37,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * The plugin slug.
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @var string
 		 * @static
 		 * @since 0.1
@@ -46,7 +46,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * The media upload directory path
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @var string
 		 * @since 0.1
 		 */
@@ -55,7 +55,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * The media upload directory uri
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @var string
 		 * @since 0.1
 		 */
@@ -85,7 +85,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 	/**
 		 * initialize the CPT arguments for register_post_type
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $uri The plugin uri (e.g. http://example.com/wp-content/plugins/myplugin )
 		 * @param string $txtdomain The plugin text domain. Used to localize the arguments.
 		 * @see http://codex.wordpress.org/Function_Reference/register_post_type
@@ -132,7 +132,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * initialize the CPT meta boxes
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 *
 		 * @param string $post_id
 		 * @param string $txtdomain The text domain to use for the label translations.
@@ -187,7 +187,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get the CPT messages
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The text domain to use for localization.
 		 * @return array $messages The messages array.
@@ -219,7 +219,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Initialize the admin_scripts property.
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The plugin text domain.
 		 * @param string $uri The plugin js uri.
@@ -276,7 +276,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * initialize the admin_css property
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $uri The uri to the plugin css directory
 		 * @since 
 		 */
@@ -319,7 +319,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Initialize the frontend js.
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $uri The plugin uri (e.g. http://example.com/wp-content/plugins/myplugin/ ).
 		 * @since 
 		 */
@@ -355,7 +355,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Initialize the frontend css
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $uri The plugin css uri
 		 * @since 0.1
 		 */
@@ -391,7 +391,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Save the shoot cpt meta.
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $post_data The $_POST data.
 		 * @since 0.1
 		 */
@@ -429,15 +429,23 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 			endif;
 		}
 		
+		/**
+		 * delete all media attached to this shoot
+		 *
+		 * @package WP Models\Models
+		 * @param string $post_id Thw WP post id.
+		 * @since 0.1
+		 */
 		public function delete( $post_id )
 		{
 			//delete all media uploaded for this shoot
+			Helper_Functions::remove_local_directory( trailingslashit( $this->media_upload_dir ) . $post_id, true );
 		}
 		
 		/**
 		 * Get the models in a shoot.
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $shoot_id the post ID of the shoot
 		 * @return array $models An array containing the post id's of the models in the shoot.
 		 * @since 0.1
@@ -464,7 +472,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get a model's shoots.
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $model_id the post id of the model
 		 * @return array $shoots contains the post id's of the shoots for this model
 		 * @since 0.1
@@ -494,7 +502,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get the shoot meta info line
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $post_id The WP post id
 		 * @return string $info The shoot meta info
 		 * @since 0.1
@@ -546,7 +554,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * 		filetype- the file extension (jpg, png, etc)
 		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
 		 
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $post_id The WP post ID.
 		 * @param string $type The media type (pics, vids). This is used to determine storage location directories.
 		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
@@ -574,7 +582,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get shoot media stored locally.
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $post_id
 		 * @param string $type the media type (pics, vids)
 		 * @return array $contents An array containing the following elements:
@@ -624,7 +632,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get shoot media stored in Amazon S3
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param string $post_id The shoot post id.
 		 * @param string $type The media type ( pics, vids ).
 		 * @param string $access_key The remote storage service public access key.
@@ -680,7 +688,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Save the media attached to this shoot
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @param object $post The $_POST object.
 		 * @param object $files The $_FILES object.
 		 * @param bool $log Log the file upload. Default is false.
@@ -702,6 +710,16 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 		return( Helper_Functions::plupload( $_POST, $_FILES, $target, $log ) );
 		}
 		
+		/**
+		 * Delete a specific media item from this shoot.
+		 *
+		 * @package WP Models\Models
+		 * @param string $post_id The WP post id.
+		 * @param string $media The media filename.
+		 * @param string $media_type The media type (pics or vids)
+		 * @param string $location The storage location.
+		 * @since 0.1
+		 */
 		public function delete_media( $post_id, $media, $media_type, $location )
 		{
 			switch( $location )
@@ -717,7 +735,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Actions required to happen at plugin activation for this CPT
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		public function activate()
@@ -743,7 +761,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Actions reqired to happen at plugin deletion
 		 *
-		 * @package WP Models\Models\Shoots CPT
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		 public function delete_plugin()

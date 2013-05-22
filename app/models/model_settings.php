@@ -2,7 +2,7 @@
 /**
  * The WP Models Settings Model
  *
- * @package WP Models\Models\Settings
+ * @package WP Models\Models
  * @author ActionHook.com <plugins@actionhook.com>
  * @since WP Models 0.1
  */
@@ -26,7 +26,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 	/**
 	 * The WP Models Settings Model
 	 *
-	 * @package WP Models\Models\Settings
+	 * @package WP Models\Models
 	 * @version 0.1
 	 * @since WP Models 0.1
 	 */
@@ -35,7 +35,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		/**
 		 * Initialize the class properties
 		 *
-		 * @package WP Models\Models\Settings
+		 * @package WP Models\Models
 		 * @param string $txtdomain The plugin text domain.
 		 * @since 0.1
 		 */

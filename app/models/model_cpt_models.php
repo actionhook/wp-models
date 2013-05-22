@@ -599,6 +599,15 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 			}
 		}
 		
+		/**
+		 * WP 'the_post' action callback
+		 *
+		 * @package WP Models\Models
+		 * @param object $post The WP post object.
+		 * @param string $location The storage location.
+		 * @return $post The modified post object.
+		 * @since 0.1
+		 */
 		public function the_post( $post, $location = 'local'  )
 		{
 			if( $post->post_type == self::$slug ):
