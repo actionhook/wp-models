@@ -2,30 +2,51 @@
 /**
  * The Shoots Custom Post Type
  *
- * @package WP Models
- * @subpackage Custom Post Types
- * @author authtoken
- * @since 0.1
+ * @package WP Models\Models\Shoots CPT
+ * @author ActionHook.com <plugins@actionhook.com>
+ * @since WP Models 0.1
  */
+/*
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+ 
 if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	/**
 	 * The WP Models Shoots CPT Model
 	 *
-	 * @package WP Models
-	 * @subpackage Custom Post Types
+	 * @package WP Models\Models\Shoots CPT
 	 * @version 0.1
 	 * @since WP Models 0.1
 	 * @todo Add Rackspace CloudFiles support
 	 * @todo Add Dropbox support
 	 */
-	class WP_Models_CPT_Shoots_Model extends Base_CPT_Model
+	class WP_Models_CPT_Shoots_Model extends Base_Model_CPT
 	{
+		/**
+		 * The plugin slug.
+		 *
+		 * @package WP Models\Models\Shoots CPT
+		 * @var string
+		 * @static
+		 * @since 0.1
+		 */
 		protected static $slug = 'wp-models-shoot';
 		/**
 		 * The media upload directory path
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @var string
 		 * @since 0.1
 		 */
@@ -34,8 +55,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * The media upload directory uri
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @var string
 		 * @since 0.1
 		 */
@@ -45,8 +65,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 	 * The class constructor.
 	 	 *
 	 	 * @package WP Models
-	 	 * @subpackage Custom Post Types
-	 	 * @param string $uri The plugin uri.
+	 	 * @param string $uri The plugin uri (e.g. http://example.com/wp-content/plugins/myplugin ).
 	 	 * @param string $txtdomain The plugin text domain. Used to localize the arguments.
 	 	 * @since 0.1
 	 	 */
@@ -66,9 +85,9 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 	/**
 		 * initialize the CPT arguments for register_post_type
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
-		 * @param string $txtdomain
+		 * @package WP Models\Models\Shoots CPT
+		 * @param string $uri The plugin uri (e.g. http://example.com/wp-content/plugins/myplugin )
+		 * @param string $txtdomain The plugin text domain. Used to localize the arguments.
 		 * @see http://codex.wordpress.org/Function_Reference/register_post_type
 		 * @since 0.1
 		 */
@@ -113,8 +132,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * initialize the CPT meta boxes
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 *
 		 * @param string $post_id
 		 * @param string $txtdomain The text domain to use for the label translations.
@@ -129,7 +147,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 			$meta = get_post_meta( $post_id, $this->metakey, true );
 			
 			$this->metaboxes = array(
-				new WP_Metabox(
+				new Base_Model_Metabox(
 					self::$slug . '-models',
 					__( 'Shoot Models', $txtdomain ),
 					null,
@@ -141,7 +159,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 						'shoot_models' => $this->get_shoot_models( $post_id )
 					) 
 				),
-				new WP_Metabox(
+				new Base_Model_Metabox(
 					self::$slug . '-pics',
 					__( 'Shoot Pictures', $txtdomain ),
 					null,
@@ -152,7 +170,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 						'view' => 'metabox_pics_html.php'
 					) 
 				),
-				new WP_Metabox(
+				new Base_Model_Metabox(
 					self::$slug . '-vids',
 					__( 'Shoot Videos', $txtdomain ),
 					null,
@@ -169,8 +187,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get the CPT messages
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The text domain to use for localization.
 		 * @return array $messages The messages array.
@@ -202,15 +219,16 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Initialize the admin_scripts property.
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param object $post The WP post object.
 		 * @param string $txtdomain The plugin text domain.
 		 * @param string $uri The plugin js uri.
 		 * @since 0.1
 		 */
 		protected function init_admin_scripts( $post, $txtdomain, $uri )
-		{			
+		{
+			$uri = trailingslashit( $uri );
+			
 			$this->admin_scripts = array(
 	 			array(
 	 				'handle' => 'jquery-plupload-queue',
@@ -221,7 +239,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 	 			),
 	 			array(
 					'handle' => 'colorbox',
-					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox-min.js',
+					'src' => $uri . 'colorbox/jquery.colorbox-min.js',
 					'deps' => array( 'jquery' ),
 					'ver' => '1.4.15',
 					'in_footer' => false
@@ -258,38 +276,39 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * initialize the admin_css property
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $uri The uri to the plugin css directory
 		 * @since 
 		 */
 		public function init_admin_css( $uri )
 		{
+			$uri = trailingslashit( $uri );
+			
 			$this->admin_css = array(
 	 			array(
 	 				'handle' => 'jquery-plupload-queue',
-	 				'src' => trailingslashit( $uri ) .  'plupload/jquery.plupload.queue/css/jquery.plupload.queue.css',
+	 				'src' => $uri .  'plupload/jquery.plupload.queue/css/jquery.plupload.queue.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
 	 			),
 	 			array(
 	 				'handle' => 'wp-models-admin',
-	 				'src' => trailingslashit( $uri ) .  'wp-models-admin.css',
+	 				'src' => $uri .  'wp-models-admin.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
 	 			),
 	 			array(
 	 				'handle' => 'flowplayer',
-	 				'src' => trailingslashit( $uri ) .  'flowplayer/functional.css',
+	 				'src' => $uri .  'flowplayer/functional.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
 	 			),
 	 			array(
 	 				'handle' => 'colorbox',
-	 				'src' => trailingslashit( $uri ) .  'colorbox/colorbox.css',
+	 				'src' => $uri .  'colorbox/colorbox.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
@@ -298,32 +317,34 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		}
 		
 		/**
-		 * Initialize the frontend js
+		 * Initialize the frontend js.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models\Models\Shoots CPT
+		 * @param string $uri The plugin uri (e.g. http://example.com/wp-content/plugins/myplugin/ ).
 		 * @since 
 		 */
 		public function init_scripts( $uri )
 		{
+			$uri = trailingslashit( $uri );
+			
 			$this->scripts = array(
 				array(
 					'handle' => 'colorbox',
-					'src' => trailingslashit( $uri ) . 'colorbox/jquery.colorbox.js',
+					'src' => $uri . 'colorbox/jquery.colorbox.js',
 					'deps' => array( 'jquery' ),
 					'ver' => '1.4.15',
 					'in_footer' => false
 				),
 				array(
 					'handle' => 'flowplayer',
-					'src' => trailingslashit( $uri ) . 'flowplayer/flowplayer.min.js',
+					'src' => $uri . 'flowplayer/flowplayer.min.js',
 					'deps' => array( 'jquery' ),
 					'ver' => '5.4.1',
 					'in_footer' => false
 				),
 				array(
 					'handle' => 'wp-models-single-model',
-					'src' => trailingslashit( $uri ) . 'wp-models-single.js',
+					'src' => $uri . 'wp-models-single.js',
 					'deps' => array( 'colorbox', 'flowplayer' ),
 					'ver' => false,
 					'in_footer' => false
@@ -334,31 +355,32 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Initialize the frontend css
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $uri The plugin css uri
 		 * @since 0.1
 		 */
 		public function init_css( $uri )
 		{
+			$uri = trailingslashit( $uri );
+			
 			$this->css = array(
 	 			array(
 	 				'handle' => 'wp-models',
-	 				'src' => trailingslashit( $uri ) .  'wp-models.css',
+	 				'src' => $uri .  'wp-models.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
 	 			),
 	 			array(
 	 				'handle' => 'colorbox',
-	 				'src' => trailingslashit( $uri ) .  'colorbox/colorbox.css',
+	 				'src' => $uri .  'colorbox/colorbox.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
 	 			),
 	 			array(
 	 				'handle' => 'flowplayer',
-	 				'src' => trailingslashit( $uri ) .  'flowplayer/minimalist.css',
+	 				'src' => $uri .  'flowplayer/minimalist.css',
 	 				'deps' => false,
 	 				'ver' => false,
 	 				'media' => 'all'
@@ -369,8 +391,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Save the shoot cpt meta.
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $post_data The $_POST data.
 		 * @since 0.1
 		 */
@@ -416,8 +437,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get the models in a shoot.
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $shoot_id the post ID of the shoot
 		 * @return array $models An array containing the post id's of the models in the shoot.
 		 * @since 0.1
@@ -444,8 +464,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get a model's shoots.
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $model_id the post id of the model
 		 * @return array $shoots contains the post id's of the shoots for this model
 		 * @since 0.1
@@ -475,8 +494,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get the shoot meta info line
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $post_id The WP post id
 		 * @return string $info The shoot meta info
 		 * @since 0.1
@@ -528,8 +546,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * 		filetype- the file extension (jpg, png, etc)
 		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
 		 
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $post_id The WP post ID.
 		 * @param string $type The media type (pics, vids). This is used to determine storage location directories.
 		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
@@ -557,8 +574,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get shoot media stored locally.
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $post_id
 		 * @param string $type the media type (pics, vids)
 		 * @return array $contents An array containing the following elements:
@@ -608,8 +624,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Get shoot media stored in Amazon S3
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param string $post_id The shoot post id.
 		 * @param string $type The media type ( pics, vids ).
 		 * @param string $access_key The remote storage service public access key.
@@ -665,8 +680,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Save the media attached to this shoot
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @param object $post The $_POST object.
 		 * @param object $files The $_FILES object.
 		 * @param bool $log Log the file upload. Default is false.
@@ -703,8 +717,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Actions required to happen at plugin activation for this CPT
 		 *
-		 * @package WP Models
-		 * @subpackage Custom Post Types
+		 * @package WP Models\Models\Shoots CPT
 		 * @since 0.1
 		 */
 		public function activate()
@@ -730,8 +743,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		/**
 		 * Actions reqired to happen at plugin deletion
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models\Models\Shoots CPT
 		 * @since 0.1
 		 */
 		 public function delete_plugin()

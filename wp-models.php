@@ -5,6 +5,7 @@
  * @package WP Models
  * @author ActionHook <plugins@actionhook.com>
  * @version 0.1
+ * @copyright 2013 ActionHook.com
  */
 
 /*
@@ -44,6 +45,7 @@ if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
 	require_once( 'base/models/base_model_metabox.php' );
 	require_once( 'base/models/base_model_cpt.php' );
 	require_once( 'base/models/base_model_settings.php' );
+	require_once( 'base/models/base_model_js_object.php' );
 	
 	require_once( 'app/controllers/plugin_controller.php' );
 	
@@ -52,6 +54,13 @@ if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
 	require_once( 'wp-models-template-tags.php' );
 }
 
+/**
+ * Add admin notices
+ *
+ * @package WP Models
+ * @internal
+ * @since WP Models 0.1
+ */
 function wp_models_fail_php_check() {
 ?>
 <div class="error">

@@ -1,15 +1,14 @@
 <?php
 /**
- * the single model view
+ * The CPT single view.
  *
- * @package pkgtoken
- * @subpackage subtoken
- * @author ActionHook.com
+ * @package WP Models\Views
  * @version 0.1
- * @since 0.1
+ * @author ActionHopk.com <plugins@actionhook.com>
+ * @since WP-Models 0.1
  */
 ?>
-<p class="<?php echo $post->post_type; ?>-info"><?php echo $info; ?></p>
+<div class="<?php echo $post->post_type; ?>-info"><?php echo $info; ?></div>
 <div class="wp-models-toggle-container">
 	<div class="<?php echo $post->post_type; ?>-content"><?php echo $content; ?></div>
 </div>
@@ -28,7 +27,7 @@
 		<h3><?php the_title() ?> Videos</h3>
 		<div class="<?php echo $post->post_type; ?>-vid is-splash color-light">
 		<?php foreach( $post_vids as $vid ):?>
-			<video>
+			<video controls>
 				<source type="<?php echo $vid['mimetype']; ?>" src="<?php echo $vid['uri']; ?>" />
 			</video>
 		<?php endforeach; ?>

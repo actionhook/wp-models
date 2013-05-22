@@ -64,14 +64,11 @@ function wp_models_init_uploader_pics()
 	        {
 				'type': 'pics'
 	    	}
-    	);
-        
-        console.log('[BeforeUpload]', 'settings:', up.settings);   
+    	); 
 	});
 		
-	pics_uploader.bind('FileUploaded', function(up, file, response )
+	pics_uploader.bind('UploadComplete', function(up, file, response )
 	{
-		console.log( response );
 		//reload the div containing the elements
 		wp_models_reload_pics();
 	});
@@ -80,16 +77,6 @@ function wp_models_init_uploader_pics()
 function wp_models_init_uploader_vids()
 {
 	var vids_uploader = jQuery(".wp-models-vids-uploader").pluploadQueue();
-/*
-	var vids_uploader = jQuery(".wp-models-vids-uploader").pluploadQueue({
-		filters: [
-			{
-				title: "Movie Files",
-				extensions : "mp4,ogv,webm"
-			}
-		]
-	});
-*/
 	
 	vids_uploader.bind('BeforeUpload', function(up, file) 
     {
@@ -98,13 +85,10 @@ function wp_models_init_uploader_vids()
 	        	'type': 'vids'
 	        }
         );
-	        
-        console.log('[BeforeUpload]', 'settings:', up.settings);
     });
 
-	vids_uploader.bind('FileUploaded', function(up, file, response)
+	vids_uploader.bind('UploadComplete', function(up, file, response)
 	{
-		console.log( '[FileUploaded]', response );
 		//reload the div containing the elements
 		wp_models_reload_vids();
 	});
@@ -132,21 +116,21 @@ function wp_models_reload_pics() {
 		jQuery('#wp-models-pics-container').html( response );
 		//initialize the colorbox
 		wp_models_init_colorbox();
-	});
-	
-	jQuery( '.wp-models-pic-delete' ).live( 'click', function(){
-		var wpm_data = {
-			action: 'wp_models_delete_shoot_pic',
-			nonce: wpModelsL10n.nonce,
-			post_id: wpModelsL10n.post_id,
-			post_type: wpModelsL10n.post_type,
-			media_type: 'pics',
-			media: jQuery( this ).val()
-		};
-		jQuery(this).html( "Deleting..." );
-		jQuery.post( ajaxurl, wpm_data, function( response ){
-			//console.log( response );
-			wp_models_reload_pics();
+		
+		//bind the delete media buttons
+		jQuery( '.wp-models-pic-delete' ).on( 'click', function(){
+			var wpm_data = {
+				action: 'wp_models_delete_shoot_pic',
+				nonce: wpModelsL10n.nonce,
+				post_id: wpModelsL10n.post_id,
+				post_type: wpModelsL10n.post_type,
+				media_type: 'pics',
+				media: jQuery( this ).val()
+			};
+			jQuery(this).html( "Deleting..." );
+			jQuery.post( ajaxurl, wpm_data, function( response ){
+				wp_models_reload_pics();
+			});
 		});
 	});
 }
@@ -162,21 +146,20 @@ function wp_models_reload_vids() {
 	
 	jQuery.post( ajaxurl, wpm_data, function( response ) {
 		jQuery('#wp-models-vids-container').html( response );
-	});
-	
-	jQuery( '.wp-models-vid-delete' ).live( 'click', function(){
-		var wpm_data = {
-			action: 'wp_models_delete_shoot_vid',
-			nonce: wpModelsL10n.nonce,
-			post_id: wpModelsL10n.post_id,
-			post_type: wpModelsL10n.post_type,
-			media_type: 'vids',
-			media: jQuery( this ).val()
-		};
-		jQuery(this).html( "Deleting..." );
-		jQuery.post( ajaxurl, wpm_data, function( response ){
-			//console.log( response );
-			wp_models_reload_vids();
+			
+		jQuery( '.wp-models-vid-delete' ).on( 'click', function() {
+			var wpm_data = {
+				action: 'wp_models_delete_shoot_vid',
+				nonce: wpModelsL10n.nonce,
+				post_id: wpModelsL10n.post_id,
+				post_type: wpModelsL10n.post_type,
+				media_type: 'vids',
+				media: jQuery( this ).val()
+			};
+			jQuery(this).html( "Deleting..." );
+			jQuery.post( ajaxurl, wpm_data, function( response ){
+				wp_models_reload_vids();
+			});
 		});
 	});
 }

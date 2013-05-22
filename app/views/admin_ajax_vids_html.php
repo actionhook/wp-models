@@ -1,12 +1,11 @@
 <?php
 /**
- * The shoot vids view
+ * The post vids admin view
  *
- * @package pkgtoken
- * @subpackage subtoken
- * @author authtoken
- * @version
- * @since
+ * @package WP Models\Views
+ * @author ActionHook.com <plugins@actionhook.com>
+ * @version 0.1
+ * @since WP Models 0.1
  */
 ?>
 

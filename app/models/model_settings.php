@@ -2,22 +2,43 @@
 /**
  * The WP Models Settings Model
  *
- * @package pkgtoken
- * @subpackage subtoken
- * @author authtoken
+ * @package WP Models\Models\Settings
+ * @author ActionHook.com <plugins@actionhook.com>
  * @since WP Models 0.1
  */
-if ( ! class_exists( WP_Models_Settings_Model ) ):
+ /*
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ 
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
+ 
+if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 	/**
 	 * The WP Models Settings Model
 	 *
-	 * @package pkgtoken
-	 * @subpackage subtoken
+	 * @package WP Models\Models\Settings
 	 * @version 0.1
 	 * @since WP Models 0.1
 	 */
 	class WP_Models_Settings_Model extends Base_Model_Settings
 	{
+		/**
+		 * Initialize the class properties
+		 *
+		 * @package WP Models\Models\Settings
+		 * @param string $txtdomain The plugin text domain.
+		 * @since 0.1
+		 */
 		protected function init( $txtdomain )
 		{
 			$this->options = array(
@@ -43,60 +64,52 @@ if ( ! class_exists( WP_Models_Settings_Model ) ):
 			
 			$this->settings_sections = array(
 				'wp-models-general' => array(
-					'title' => __( 'General Settings', $txtdomain ),
-					'callback' => null,
-					'page' => 'wp-models-options'
+					'title' 	=> __( 'General Settings', $txtdomain ),
+					'callback'	=> null,
+					'page' 		=> 'wp-models-options'
+				),
+				'wp-models-flowplayer' => array(
+					'title'		=> __( 'Flowplayer Settings', $txtdomain ),
+					'callback'	=> null,
+					'page'		=> 'wp-models-options',
+					'content'	=> __( 'This section allows you to customize the different Flowplayer options.', $txtdomain )
 				)
 			);
+			
 			
 			$this->settings_fields = array(
 				'use_filter' => array(
-					'title' => __( 'Use content filter?', $txtdomain ),
-					'callback' => null,
-					'page' => 'wp-models-options',
-					'section' => 'wp-models-general',
+					'title'			=> __( 'Use content filter?', $txtdomain ),
+					'callback'		=> null,
+					'page'			=> 'wp-models-options',
+					'section'		=> 'wp-models-general',
+					'default'		=> false,
 					'args' => array(
-						'type' => 'checkbox',
-						'id' => 'wp-models-use-filter',
-						'name' => 'wp_models_general[use_filter]',
-						'value' => $this->get_settings( 'wp_models_general', 'use_filter' )
+						'type'		=> 'checkbox',
+						'id'		=> 'wp-models-use-filter',
+						'name'		=> 'wp_models_general[use_filter]',
+						'value'		=> $this->get_settings( 'wp_models_general', 'use_filter' )
+					)
+				),
+				'flowplayer_style' => array(
+					'title'			=> __( 'Flowplayer style', $txtdomain ),
+					'callback'		=> null,
+					'page'			=> 'wp-models-options',
+					'section'		=> 'wp-models-flowplayer',
+					'default'		=> 1,
+					'args' => array(
+						'type'		=> 'select',
+						'id'		=> 'wp-models-flowplayer-style',
+						'name'		=> 'wp_models_general[flowplayer_style]',
+						'value' 	=> $this->get_settings( 'wp_models_general', 'flowplayer_style' ),
+						'options'	=> array(
+							'Minimalist'	=> 1,
+							'Functional'	=> 2,
+							'Playful'		=> 3
+						)
 					)
 				)
 			);
-			
-			/*
-$this->settings = array(
-				'use_amazon' => false,
-				'amazon_bucket' => 'wp-models',
-				'amazon_accessKeyId' => 'AKIAJ7QBMH6DECYGW7WQ',
-				'amazon_secret' => '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',
-				'amazon_storage_class' => 	STANDARD,
-				'storage_locations' => array( 'local', 'amazons3' )
-			);
-*/
-		}
-		
-		
-		
-		public function get_storage_settings()
-		{
-			if( $this->settings['use_amazon'] ):
- 				$settings = array(
-	 				'location' => 'amazonS3',
-	 				'access_key' => $this->settings['amazon_accessKeyId'],
-	 				'secret_key' => $this->settings['amazon_secret'],
-	 				'bucket' =>$this->settings['amazon_bucket']
- 				);
-	 		else:
-	 			$settings = array(
-		 			'location' => 'local',
-		 			'access_key' => null,
-		 			'secret_key' => null,
-		 			'bucket' => null
-	 			);
-	 		endif;
-	 		
-	 		return $settings;
 		}
 	}
 endif;

@@ -2,82 +2,113 @@
 /**
  * Main plugin controller.
  *
- * @package WP Models
- * @author authtoken
+ * @package WP Models\Controllers\Main Plugin Controller
+ * @author ActionHook.com <plugins@actionhook.com>
+ * @since WP Models 0.1
+ * @copyright 2013 ActionHook.com
  */
+/*
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
 
-if ( ! class_exists( WP_Models ) ):
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+if ( ! class_exists( 'WP_Models' ) ):
 	/**
 	 * The main WP_Models controller class
 	 *
-	 * @package WP Models
+	 * @package WP Models\Controllers\Main Plugin Controller
 	 *
 	 * @version 0.1
 	 * @since WP Models 0.1
-	 * @todo add activate function that creates db table
 	 */
 	 class WP_Models extends Base_Controller_Plugin
 	 {
 	 	/**
 	 	 * Initialize the plugin
 	 	 *
-	 	 * @package WP Models
-	 	 *
-	 	 * @since 0.1
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+		 * @since 0.1
 	 	 */
 	 	public function init()
 	 	{
 	 		//require necessary files
 	 		require_once( $this->app_models_path . '/model_cpt_models.php' );
-	 		require_once( $this->app_models_path . '/model_cpt_shoots.php' );
 	 		require_once( $this->app_models_path . '/model_settings.php' );
 	 		
+	 		/**
+	 		 * The Models CPT slug.
+	 		 */
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
-	 		define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
 	 			
 	 		//get the plugin settings
 	 		$this->settings_model = new WP_Models_Settings_Model( $this->txtdomain );
-			//print_r( $this->settings_model );
 			
 	 		//set up the plugin custom post types
 	 		$this->cpts = array(
-	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain ),
-	 			_WP_MODELS_CPT_SHOOTS_SLUG => new WP_Models_CPT_Shoots_Model( $this->uri, $this->txtdomain )
+	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain )
 	 		);
 	 		
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
 	 		$this->nonce_action = '5tyhjDR%6%$%^&*IuhbnmknbGTRFGHJN';
-	 		
+	 		$this->add_actions_and_filters();
+	 	}
+	 	
+	 	/**
+	 	 * Add action and filter callbacks.
+	 	 *
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @since 0.1
+	 	 */
+	 	private function add_actions_and_filters()
+	 	{
 	 		//filter metabox callback args as necessary
 	 		add_filter( 'filter_metabox_callback_args', array( &$this, 'setup_metabox_args' ), 10, 2 );
 	 		
 	 		//add our ajax callbacks
-	 		add_action( 'wp_ajax_wp_models_media_upload', 	array( &$this, 'ajax_media_upload' ) );
-	 		add_action( 'wp_ajax_wp_models_get_media', 		array( &$this, 'ajax_get_media' ) );
+	 		add_action( 'wp_ajax_wp_models_media_upload', 		array( &$this, 'ajax_media_upload' ) );
+	 		add_action( 'wp_ajax_wp_models_get_media', 			array( &$this, 'ajax_get_media_admin' ) );
+	 		add_action( 'wp_ajax_nopriv_wp_models_get_media', 	array( &$this, 'ajax_get_media' ) );
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_pic', 	array( &$this, 'ajax_delete_media' ) );
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_vid', 	array( &$this, 'ajax_delete_media' ) );
 	 		
-	 		//filter js l10n as necessary
-	 		add_filter( 'ah_base_filter_admin_scripts_l10n_args-wp-models-admin-cpt',	array( &$this, 'filter_admin_cpt_js' ), 10 );
+	 		//filter the wp-models-admin-cpt js localization args
+	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-cpt',	array( &$this, 'filter_admin_cpt_js' ) );
+	 		
+	 		//filter css as necessary
+	 		add_filter( 'ah_base_filter_styles-flowplayer', array( &$this, 'filter_flowplayer_css' ) );
 	 		
 	 		//Add additional mimetypes for video uploads
 			add_filter( 'upload_mimes', array( &$this, 'custom_mimes' ) );
 			
 			//add content filters if so desired
-			if ( $this->settings_model->settings['wp_models_general']['use_filter'] )
+			$this->settings_model->get_settings( 'wp_models_general', 'use_filter' );
+			
+			if ( $this->settings_model->get_settings( 'wp_models_general', 'use_filter' ) )
 				add_filter( 'the_content',	array( &$this, 'render_single_view' ) );
+				
 	 	}
 	 	
 	 	/**
 	 	 * Add additional metabox callback args as necessary for views.
 	 	 *
-	 	 * @package WP Models
-	 	 *
-	 	 * @param object $post The WP post object.
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+		 * @param object $post The WP post object.
 	 	 * @param array $metabox The WP metabox array.
 	 	 * @return array $metabox The modified WP metabox array.
-	 	 * @since 
+	 	 * @todo remove for codex version
+	 	 * @since 0.1
 	 	 */
 	 	public function setup_metabox_args( $post, $metabox )
 	 	{	
@@ -94,13 +125,11 @@ if ( ! class_exists( WP_Models ) ):
 	 		return $metabox;
 	 	}
 	 	
-	 	
 	 	/**
 	 	 * The ajax media upload callback.
 	 	 *
-	 	 * @package WP Models
-	 	 *
-	 	 * @since 0.1
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+		 * @since 0.1
 	 	 */
 	 	public function ajax_media_upload()
 	 	{
@@ -109,68 +138,93 @@ if ( ! class_exists( WP_Models ) ):
 	 			die( 'NONCE CHECK FAILED' );
 		
 	 		$result = $this->cpts[$_POST['post_type']]->save_media( $_POST, $_FILES, true );
-	 		//print_r( $_POST);
 	 		die( $result );
+	 	}
+	 	
+	 	/**
+	 	 * The admin ajax media render callback
+	 	 *
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+		 * @since 0.1
+	 	 */
+	 	public function ajax_get_media_admin()
+	 	{
+	 		$view = trailingslashit( $this->app_views_path ) . 'admin_ajax_'. $_POST['media_type'] . '_html.php';
+	 		die( $this->render_media( $_POST['post'], $_POST['post_type'], $_POST['media_type'], $view ) );
 	 	}
 	 	
 	 	/**
 	 	 * The ajax media render callback
 	 	 *
-	 	 * @package WP Models
-	 	 *
-	 	 * @since 0.1
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+		 * @since 0.1
 	 	 */
 	 	public function ajax_get_media()
 	 	{
+	 		$view = trailingslashit( $this->app_views_path ) . 'ajax_'. $_POST['media_type'] . '_html.php';
+	 		die( $this->render_media( $_POST['post'], $_POST['post_type'], $_POST['media_type'], $view ) );
+	 	}
 	 	
-	 		//print_r( $_POST );
-	 		//configure the get_shoot_media parameters and include required files based on storage location
-	 		/**
-	 		 * @todo change settings to use storage_location
-	 		 */
-	 		 
-	 		$settings = $this->settings->get_storage_settings();
-	 		
-	 		if( $settings['location'] == 'amazonS3' )
-	 			require_once( trailingslashit( $this->path) . 'lib/s3.php' );
-			
+	 	/**
+	 	 * Get the media of a specific type attached to this post.
+	 	 *
+	 	 * @package WP Models\Controllers
+	 	 * @param string $post_id The WP post id.
+	 	 * @param string $post_type The post type.
+	 	 * @param string $type The media type.
+	 	 * @return string|bool The pics html. FALSE on failure.
+	 	 * @since 0.1
+	 	 */
+	 	
+	 	public function render_media( $post_id, $post_type, $media_type, $view = null )
+	 	{
 			//get the post media
-			$post_media = $this->cpts[$_POST['post_type']]->get_media( 
-				$_POST['post'],
-				$_POST['media_type'],
-				$settings['location'],
-				$settings['access_key'],
-				$settings['secret_key'],
-				$settings['$bucket']
-			);
-			
-			//set variables for the template
-			$uri = $this->uri;
+			$post_media = $this->cpts[$post_type]->get_media( $post_id, $media_type );
 			
 			//if we have an array of media items, include the appropriate view
-	 		if ( is_array( $post_media ) ):
+	 		if (  $post_media ):
+	 			if ( is_null( $view ) )
+	 				$view = trailingslashit( $this->app_views_path ) . 'ajax_'. $media_type . '_html.php';
+	 			
+	 			//set variables for the template
+				$uri = $this->uri;
+				$txtdomain = $this->txtdomain;
+				
+				switch( $media_type )
+				{
+					case 'pics':
+						$title = sprintf( '%s %s', get_the_title(), _x( 'Pictures', $this->txtdomain ) );
+						break;
+					case 'vids':
+						$title = sprintf( '%s %s', get_the_title(), _x( 'Videos', $this->txtdomain ) );
+						break;
+				}
+				
+				//Render the view
 		 		ob_start();
-		 		require_once( trailingslashit( $this->app_views_path ) . 'admin_ajax_'. $_POST['media_type'] . '_html.php' );
-		 		$html = ob_get_clean();
+		 		require_once( $view );
+		 		return ob_get_clean();
+	 		else:
+	 			switch( $media_type )
+	 			{
+	 				case 'pics':
+	 					return __( 'There are no pictures associated with this post.', $this->txtdomain );
+	 					break;
+	 				case 'vids':
+	 					return __( 'There are no videos associated with this post.', $this->txtdomain );
+	 					break;
+	 				default:
+	 					return false;
+	 					break;
+	 			}
 	 		endif;
-	 		
-	 		if ( $html == '' ):
-	 			if ( $_POST['media_type'] == 'pics' ):
-	 				$html = __( 'There are no pictures associated with this post.', $this->txtdomain );
-	 			else:
-	 				$html = __( 'There are no videos associated with this post.', $this->txtdomain );
-	 			endif;
-	 		endif;
-	 		
-	 		die( $html );
 	 	}
 	 	
 	 	/**
 	 	 * The callback for the ajax delete media handler.
 	 	 *
-	 	 * @package WP Models
-	 	 *
-	 	 * @since 0.1
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+		 * @since 0.1
 	 	 */
 	 	public function ajax_delete_media()
 	 	{
@@ -178,25 +232,21 @@ if ( ! class_exists( WP_Models ) ):
 	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
 	 			die( 'Security check failed' );
 	 				
-	 		//print_r( $_POST );
 	 		if ( $_POST['action'] == 'wp_models_delete_shoot_pic' ):
 	 			$type = 'pics';
 	 		elseif ( $_POST['action'] == 'wp_models_delete_shoot_vid' ):
 	 			$type = 'vids';
 	 		endif;
 	 		
-	 		$settings = $this->settings->get_storage_settings();
-	 		
-	 		$result = $this->cpts[$_POST['post_type']]->delete_media( $_POST['post_id'], $_POST['media'], $type, $settings['location'] );
+	 		$result = $this->cpts[$_POST['post_type']]->delete_media( $_POST['post_id'], $_POST['media'], $type );
 	 		die( $result );
 	 	}
 	 	
 	 	/**
 	 	 * Add mime types to WP
 	 	 *
-	 	 * @package WP Models
-	 	 *
-	 	 * @param array $mimes The exising mimes object.
+	 	 * @package WP Models\Controllers\Main Plugin Controller
+		 * @param array $mimes The exising mimes object.
 	 	 * @since 0.1
 	 	 */
 	 	public function custom_mimes( $mimes )
@@ -209,71 +259,40 @@ if ( ! class_exists( WP_Models ) ):
 		/**
 		 * Filter the arguments for the wp-models-cpt-shoots-admin js
 		 *
-		 * @package WP Models
-		 *
-		 * @param string $handle The script handle registered with wp_enquque_script.
+		 * @package WP Models\Controllers\Main Plugin Controller
 		 * @param array $args Contains key/value pairs of script localizations.
 		 * @since 0.1
 		 */
-		public function filter_shoot_cpt_admin_js( $args )
+		public function filter_admin_cpt_js( $args )
 		{
-			$settings = $this->settings->get_storage_settings();
-			
-			if ( $settings['location'] == 'amazonS3' ):
-				require_once( trailingslashit( $this->path ) . 'lib/class-s3.php' );
-				
-				//get the Amazon S3 settings
-				$bucket = $settings['bucket'];
-				$accessKeyId = $settings['accessKeyId'];
-				$secret = $settings['secret'];
-				//This is for setting either Standard or Reduced Redundancy Storage. Currently, STANDARD is always selected even when
-				//the value of this is REDUCED_REDUNDANCY
-				$storage_class = $settings['storage_class'];
-				
-				$S3 = new S3_Helper_Functions( $bucket, $accessKeyId, $secret );
-				
-				//set the Amazon S3 upload policy-- see http://docs.aws.amazon.com/AmazonS3/2006-03-01/dev/HTTPPOSTForms.html
-				$policy = array(
-					// ISO 8601 - date('c'); generates uncompatible date, so better do it manually
-					'expiration' => date('Y-m-d\TH:i:s.000\Z', strtotime('+1 day')),  
-					'conditions' => array(
-						array('bucket' => $bucket),
-						array('acl' => 'private'),
-						array('starts-with', '$key', ''),
-						array('starts-with', '$Content-Type', ''),
-						// "Some versions of the Adobe Flash Player do not properly handle HTTP responses that have an empty body. 
-						// To configure POST to return a response that does not have an empty body, set success_action_status to 201.
-						// When set, Amazon S3 returns an XML document with a 201 status code." 
-						// http://docs.amazonwebservices.com/AmazonS3/latest/dev/HTTPPOSTFlash.html
-						array('success_action_status' => '201'),
-						// Plupload internally adds name field, so we need to mention it here
-						array('starts-with', '$name', ''), 	
-						// One more field to take into account: Filename - gets silently sent by FileReference.upload() in Flash
-						// http://docs.amazonwebservices.com/AmazonS3/latest/dev/HTTPPOSTFlash.html
-						array('starts-with', '$Filename', ''), 
-					)
-				);
-				
-				//encode the policy
-				$policy = $S3->encode_policy( $policy );
-				//sign the policy
-				$signature = $S3->sign_policy( $policy );
-				
-				//set the args to be passed to the js
-				$args['storage'] = 'S3';
-				$args['storage_class'] = $storage_class;
-				$args['url'] = sprintf( 'https://%s.s3.amazonaws.com:443/', $bucket );
-				$args['bucket'] = $bucket;
-				$args['accessKeyId'] = $accessKeyId;
-	 			$args['policy'] = $policy;
-	 			$args['signature'] = $signature;
-			endif;
-			
 			//add the nonce for media uploads/deletes
 			$args['nonce'] = wp_create_nonce( $this->nonce_name );
 			
-			//return the modified args
 			return $args;
+		}
+		
+		/**
+		 * Change the Flowplayer CSS based on plugin settings
+		 *
+		 * @package WP Models\Controllers\Main Plugin Controller
+		 * @param object $style The style object.
+		 * @since 0.1
+		 */
+		public function filter_flowplayer_css( $style )
+		{
+			switch( $this->settings_model->get_settings( 'wp_models_general', 'flowplayer_style' ) )
+			{
+				case 2:
+					$style['src'] = trailingslashit( $this->css_uri ) . 'flowplayer/functional.css';
+					break;
+				case 3:
+					$style['src'] = trailingslashit( $this->css_uri ) . 'flowplayer/playful.css';
+					break;
+				default:
+					$style['src'] = trailingslashit( $this->css_uri ) . 'flowplayer/minimalist.css';
+			}
+			
+			return $style;
 		}
 		
 		/**
@@ -281,8 +300,7 @@ if ( ! class_exists( WP_Models ) ):
 		 *
 		 * This view is rendered using the WP filter the_content. This is done to ensure compatibility with all themes and membership plugins.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
+		 * @package WP Models\Controllers\Main Plugin Controller
 		 * @param string $content The WP post content.
 		 * @since 0.1
 		 * @todo Modfiy this function to allow for end user views in their theme directory
@@ -291,55 +309,49 @@ if ( ! class_exists( WP_Models ) ):
 		{
 			global $post;
 			
-			if( is_single() && isset ( $this->cpts[$post->post_type] ) ):
-				/*
-$settings = $this->settings->get_storage_settings();
-	 		
-		 		if( $settings['location'] == 'amazonS3' )
-		 			require_once( trailingslashit( $this->path) . 'lib/s3.php' );
-*/
-				
+			if( is_single() && isset ( $this->cpts[$post->post_type] ) ):				
 				//get the post media
 				$post_pics = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
-					'pics'/*
-,
-					$settings['location'],
-					$settings['access_key'],
-					$settings['secret_key'],
-					$settings['$bucket']
-*/
+					'pics'
 				);
 				
 				$post_vids = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
-					'vids'/*
-,
-					$settings['location'],
-					$settings['access_key'],
-					$settings['secret_key'],
-					$settings['$bucket']
-*/
+					'vids'
 				);
 				
 				//add additional view variables
-				$info = $this->cpts[$post->post_type]->get_info( $post->ID );
+				$info = sprintf( '<p>Age: %1$s | Height: %2$s | Weight: %3$s | %4$s-%5$s-%6$s</p>',
+					$post->model_age,
+					$post->model_height,
+					$post->model_weight,
+					$post->model_bust,
+					$post->model_waist,
+					$post->model_hips
+				);
+				
+				//this allows the user to add a content-$post_type_slug.php in their theme directory and use that.
+				if( file_exists( get_stylesheet_directory() . '/content-' . $post->post_type . '.php' ) ) :
+					$view = get_stylesheet_directory() . '/content-' . $post->post_type . '.php';
+				else :
+					$view = trailingslashit( $this->app_views_path ) . 'wp-models-cpt-single.php';
+				endif;
 				
 				//include the view
 				ob_start();
-				require_once( trailingslashit( $this->app_views_path ) . 'wp-models-cpt-single.php' );
-				$content = ob_get_clean();
+				require_once( $view );
+				$content = apply_filters( 'wp_models_model_content', ob_get_clean(), $post );
 			endif;
 			
 			return $content;
 		}
 		
 		/**
-		 * Description
+		 * The plugin activation routine.
 		 *
-		 * @package pkgtoken
-		 * @subpackage subtoken
-		 * @since 
+		 * @package WP Models\Controllers\Main Plugin Controller
+		 * @since 0.1
 		 * @todo add routine to set the default settings
 		 */
 		public static function activate()
@@ -349,16 +361,15 @@ $settings = $this->settings->get_storage_settings();
 		/**
 		 * The plugin deletion callback
 		 *
-		 * @package WP Models
+		 * @package WP Models\Controllers\Main Plugin Controller
 		 *
 		 * @since 0.1
 		 * @todo implement this function
 		 */
-	 	public function delete()
+	 	public static function delete()
 	 	{
 	 		//delete the shoot models table
-			//remove all meta from postmeta
-			//create the wp_models upload directory and add index.php
+			//delete the uploads directory
 	 	}
 	 }
 endif;

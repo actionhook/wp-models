@@ -1,15 +1,20 @@
+/**
+ * The cpt single page view javascript.
+ *
+ * @package WP Models
+ * @author ActionHook <plugins@actionhook.com>
+ * @version 0.1
+ * @since WP Models 0.1
+ * @todo Add filetype filters to uploaders
+ * @todo Add filetype checks before upload
+ */
+
 jQuery(document).ready( function(jQuery) {
 	wp_models_init_colorbox();
 	wp_models_init_player();
 
 	wp_models_init_toggle();
 });
-
-function togglePanel() {
-    var jQuerythis = jQuery(this);
-    jQuerythis.parent().prev().slideToggle('slow');
-    jQuerythis.hide().siblings().show();
-}
 
 function wp_models_init_colorbox()
 {
@@ -22,7 +27,11 @@ function wp_models_init_colorbox()
 
 function wp_models_init_player()
 {
-	jQuery('.wp-models-model-vid').flowplayer();
+	jQuery('.wp-models-model-vid').flowplayer(
+		{
+			swf: "flowplayer.swf"
+		}
+	);
 }
 
 function wp_models_init_toggle()

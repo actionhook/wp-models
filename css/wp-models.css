@@ -31,6 +31,8 @@
 {
 	width: 45%;
 	margin: 2.0%;
+	vertical-align: top;
+	float: left;
 }
 
 .single-wp-models-model .flowplayer
@@ -60,7 +62,7 @@
 	.single-wp-models-shoot .wp-models-shoot-pic
 	{
 		width: 18%;
-		margin: 0.72%;
+		margin: 1%;
 	}
 		
 }

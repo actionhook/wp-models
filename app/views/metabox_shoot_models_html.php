@@ -4,11 +4,10 @@
  *
  * This view renders a list of checkboxs with the model names. User can select the names of the models attached to this shoot.
  *
- * @package pkgtoken
- * @subpackage subtoken
- * @author authtoken
+ * @package WP Models\Views
  * @version 0.1
- * @since 0.1
+ * @author ActionHopk.com <plugins@actionhook.com>
+ * @since WP-Models 0.1
  */
 echo $nonce;
 foreach( $metabox['args']['models'] as $key => $model ):
