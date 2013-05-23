@@ -147,6 +147,22 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		}
 		
 		/**
+		 * Inititalize the help screen tab
+		 *
+		 * @package pkgtoken
+		 * @param string $txtdomain The plugin text domain.
+		 @ param string $path The absolute path to the app views directory.
+		 * @since 0.1
+		 */
+		protected function init_help_screen( $path, $txtdomain )
+		{
+			$this->help_screen = array(
+				new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-help', null, null, $path . 'help_screen_wp_models_model_overview.html' ),
+				new Base_Model_Help_Tab( __( 'Uploading Media', $txtdomain ), 'wp-models-help-upload', null, null, $path . 'help_screen_wp_models_upload.html' )
+			);
+		}
+		
+		/**
 		 * Initialize the admin_scripts property.
 		 *
 		 * @package WP Models\Models
@@ -599,6 +615,15 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 			}
 		}
 		
+		/**
+		 * WP 'the_post' action callback
+		 *
+		 * @package WP Models\Models
+		 * @param object $post The WP post object.
+		 * @param string $location The storage location.
+		 * @return $post The modified post object.
+		 * @since 0.1
+		 */
 		public function the_post( $post, $location = 'local'  )
 		{
 			if( $post->post_type == self::$slug ):

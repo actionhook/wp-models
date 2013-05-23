@@ -2,7 +2,7 @@
 /**
  * Main plugin controller.
  *
- * @package WP Models\Controllers\Main Plugin Controller
+ * @package WP Models\Controllers
  * @author ActionHook.com <plugins@actionhook.com>
  * @since WP Models 0.1
  * @copyright 2013 ActionHook.com
@@ -27,7 +27,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	/**
 	 * The main WP_Models controller class
 	 *
-	 * @package WP Models\Controllers\Main Plugin Controller
+	 * @package WP Models\Controllers
 	 *
 	 * @version 0.1
 	 * @since WP Models 0.1
@@ -37,7 +37,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * Initialize the plugin
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 		 * @since 0.1
 	 	 */
 	 	public function init()
@@ -52,7 +52,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
 	 			
 	 		//get the plugin settings
-	 		$this->settings_model = new WP_Models_Settings_Model( $this->txtdomain );
+	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
 			
 	 		//set up the plugin custom post types
 	 		$this->cpts = array(
@@ -68,7 +68,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * Add action and filter callbacks.
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 	 	 * @since 0.1
 	 	 */
 	 	private function add_actions_and_filters()
@@ -103,7 +103,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * Add additional metabox callback args as necessary for views.
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 		 * @param object $post The WP post object.
 	 	 * @param array $metabox The WP metabox array.
 	 	 * @return array $metabox The modified WP metabox array.
@@ -128,7 +128,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * The ajax media upload callback.
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 		 * @since 0.1
 	 	 */
 	 	public function ajax_media_upload()
@@ -144,7 +144,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * The admin ajax media render callback
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 		 * @since 0.1
 	 	 */
 	 	public function ajax_get_media_admin()
@@ -156,7 +156,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * The ajax media render callback
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 		 * @since 0.1
 	 	 */
 	 	public function ajax_get_media()
@@ -166,12 +166,13 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	}
 	 	
 	 	/**
-	 	 * Get the media of a specific type attached to this post.
+	 	 * Render the media of a specific type attached to this post.
 	 	 *
 	 	 * @package WP Models\Controllers
 	 	 * @param string $post_id The WP post id.
 	 	 * @param string $post_type The post type.
-	 	 * @param string $type The media type.
+	 	 * @param string $media_type The media type.
+	 	 * @param string $view The view to used to render the content.
 	 	 * @return string|bool The pics html. FALSE on failure.
 	 	 * @since 0.1
 	 	 */
@@ -223,7 +224,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * The callback for the ajax delete media handler.
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 		 * @since 0.1
 	 	 */
 	 	public function ajax_delete_media()
@@ -245,7 +246,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * Add mime types to WP
 	 	 *
-	 	 * @package WP Models\Controllers\Main Plugin Controller
+	 	 * @package WP Models\Controllers
 		 * @param array $mimes The exising mimes object.
 	 	 * @since 0.1
 	 	 */
@@ -259,7 +260,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		/**
 		 * Filter the arguments for the wp-models-cpt-shoots-admin js
 		 *
-		 * @package WP Models\Controllers\Main Plugin Controller
+		 * @package WP Models\Controllers
 		 * @param array $args Contains key/value pairs of script localizations.
 		 * @since 0.1
 		 */
@@ -274,7 +275,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		/**
 		 * Change the Flowplayer CSS based on plugin settings
 		 *
-		 * @package WP Models\Controllers\Main Plugin Controller
+		 * @package WP Models\Controllers
 		 * @param object $style The style object.
 		 * @since 0.1
 		 */
@@ -300,7 +301,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 *
 		 * This view is rendered using the WP filter the_content. This is done to ensure compatibility with all themes and membership plugins.
 		 *
-		 * @package WP Models\Controllers\Main Plugin Controller
+		 * @package WP Models\Controllers
 		 * @param string $content The WP post content.
 		 * @since 0.1
 		 * @todo Modfiy this function to allow for end user views in their theme directory
@@ -350,7 +351,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		/**
 		 * The plugin activation routine.
 		 *
-		 * @package WP Models\Controllers\Main Plugin Controller
+		 * @package WP Models\Controllers
 		 * @since 0.1
 		 * @todo add routine to set the default settings
 		 */
@@ -361,7 +362,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		/**
 		 * The plugin deletion callback
 		 *
-		 * @package WP Models\Controllers\Main Plugin Controller
+		 * @package WP Models\Controllers
 		 *
 		 * @since 0.1
 		 * @todo implement this function
