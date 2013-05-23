@@ -42,6 +42,8 @@ if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
 	//include our base classes
 	require_once( 'base/helper.php' );
 	require_once( 'base/controllers/base_controller_plugin.php' );
+	require_once( 'base/models/base_model.php' );
+	require_once( 'base/models/base_model_help_tab.php' );
 	require_once( 'base/models/base_model_metabox.php' );
 	require_once( 'base/models/base_model_cpt.php' );
 	require_once( 'base/models/base_model_settings.php' );

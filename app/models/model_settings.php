@@ -39,7 +39,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		 * @param string $txtdomain The plugin text domain.
 		 * @since 0.1
 		 */
-		protected function init( $txtdomain )
+		protected function init( $uri, $path, $txtdomain )
 		{
 			$this->options = array(
 				'wp-models' => array(
@@ -58,7 +58,10 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 					'menu_slug'		=> 'wp-models-options',
 					'icon_url'		=> null,
 					'callback'		=> null,
-					'js'			=> array()
+					'js'			=> array(),
+					'help_screen'	=> array(
+							new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-settings-help', null, null, $path . 'help_screen_settings_general.php' )
+					)
 				)
 			);
 			

@@ -52,7 +52,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
 	 			
 	 		//get the plugin settings
-	 		$this->settings_model = new WP_Models_Settings_Model( $this->txtdomain );
+	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
 			
 	 		//set up the plugin custom post types
 	 		$this->cpts = array(
