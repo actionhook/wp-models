@@ -36,6 +36,8 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		 * Initialize the class properties
 		 *
 		 * @package WP Models\Models
+		 * @param string $uri The plugin uri.
+		 * @param string $path The plugin app views path.
 		 * @param string $txtdomain The plugin text domain.
 		 * @since 0.1
 		 */

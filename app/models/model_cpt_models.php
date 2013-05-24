@@ -149,9 +149,9 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		/**
 		 * Inititalize the help screen tab
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
+		 * @param string $path The absolute path to the plugin app views directory.
 		 * @param string $txtdomain The plugin text domain.
-		 @ param string $path The absolute path to the app views directory.
 		 * @since 0.1
 		 */
 		protected function init_help_screen( $path, $txtdomain )
