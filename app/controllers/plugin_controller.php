@@ -336,13 +336,13 @@ if ( ! class_exists( 'WP_Models' ) ):
 				if( file_exists( get_stylesheet_directory() . '/content-' . $post->post_type . '.php' ) ) :
 					$view = get_stylesheet_directory() . '/content-' . $post->post_type . '.php';
 				else :
-					$view = trailingslashit( $this->app_views_path ) . 'wp-models-cpt-single.php';
+					$view = trailingslashit( $this->app_views_path ) . 'content-' . $post->post_type . '.php';
 				endif;
 				
 				//include the view
 				ob_start();
 				require_once( $view );
-				$content = apply_filters( 'wp_models_model_content', ob_get_clean(), $post );
+				$content = ob_get_clean();
 			endif;
 			
 			return $content;
