@@ -116,6 +116,16 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 				)
 			);
 		}
+		
+		public function add_settings_section( $section )
+		{
+			$this->settings_sections = array_merge( $this->settings_sections, $section );
+		}
+		
+		public function add_settings_field( $settings )
+		{
+			$this->settings_fields = array_merge( $this->settings_fields, $settings );
+		}
 	}
 endif;
 ?>

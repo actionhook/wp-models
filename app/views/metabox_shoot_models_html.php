@@ -11,8 +11,11 @@
  */
 echo $nonce;
 foreach( $metabox['args']['models'] as $key => $model ):
-	if( is_array( $metabox['args']['shoot_models'] ) )
+	if( is_array( $metabox['args']['shoot_models'] ) ):
 		$checked = in_array( $key, $metabox['args']['shoot_models'] ) ? ' checked' : '';
+	else:
+		$checked = '';
+	endif;
 ?>
 <p><input type="checkbox" name="wp-models-shoot-model[]" value="<?php echo $key; ?>"<?php echo $checked;?>> <?php echo $model; ?></p>
 <?php endforeach; ?>
