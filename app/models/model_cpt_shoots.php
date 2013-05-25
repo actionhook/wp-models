@@ -645,7 +645,11 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 				endif;
 			endif;
 			
-			return $contents;
+			if( isset( $contents ) ):
+				return $contents;
+			else:
+				return false;
+			endif;
 		}
 		
 		/**

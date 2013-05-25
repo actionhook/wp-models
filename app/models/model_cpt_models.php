@@ -524,6 +524,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		 * 		filename- the media item filename
 		 * 		filetype- the file extension (jpg, png, etc)
 		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
+		 * @todo move this out to a helper lib
 		 * @since 0.1
 		 */
 		private function get_shoot_media_local( $post_id, $type )
