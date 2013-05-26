@@ -10,12 +10,20 @@
  * @since WP-Models 0.1
  */
 echo $nonce;
-foreach( $metabox['args']['models'] as $key => $model ):
-	if( is_array( $metabox['args']['shoot_models'] ) ):
-		$checked = in_array( $key, $metabox['args']['shoot_models'] ) ? ' checked' : '';
-	else:
-		$checked = '';
-	endif;
+if( isset( $metabpx['args']['models'] ) && is_array( $metabpx['args']['models'] ) ):
+	foreach( $metabox['args']['models'] as $key => $model ):
+		if( is_array( $metabox['args']['shoot_models'] ) ):
+			$checked = in_array( $key, $metabox['args']['shoot_models'] ) ? ' checked' : '';
+		else:
+			$checked = '';
+		endif;
+	?>
+	<p><input type="checkbox" name="wp-models-shoot-model[]" value="<?php echo $key; ?>"<?php echo $checked;?>> <?php echo $model; ?></p>
+<?php 
+	endforeach;
+else:
 ?>
-<p><input type="checkbox" name="wp-models-shoot-model[]" value="<?php echo $key; ?>"<?php echo $checked;?>> <?php echo $model; ?></p>
-<?php endforeach; ?>
+<p><?php _e( 'You have not set up any models! Once you do, you can add them to this shoot here.', $txtdomain );?></p>
+<?php 
+endif;
+?>

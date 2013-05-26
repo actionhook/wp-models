@@ -113,7 +113,6 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 				'description'         	=> __( 'Shoots', $txtdomain ),
 				'labels'              	=> $labels,
 				'supports'            	=> array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' ),
-				'taxonomies'          	=> null,
 				'hierarchical'        	=> false,
 				'public'              	=> true,
 				'show_ui'             	=> true,
