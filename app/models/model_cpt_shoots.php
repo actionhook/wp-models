@@ -768,14 +768,15 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 			$wpdb->query( 
 				$wpdb->prepare( 
 					"
-			         CREATE TABLE IF NOT EXISTS `$db_table_name`  (
+			         CREATE TABLE IF NOT EXISTS `%s`  (
 						`shoot_id` int(11) NOT NULL DEFAULT '0',
 						`model_id` int(11) NOT NULL DEFAULT '0',
 						PRIMARY KEY (`model_id`,`shoot_id`),
 						KEY `model_id` (`model_id`),
 						KEY `shoot_id` (`shoot_id`)
 					) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-					"
+					",
+					$wpdb->prefix . $this->shoot_model_table
 			        )
 			);
 		}
@@ -794,8 +795,9 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		 	$wpdb->query( 
 				$wpdb->prepare( 
 					"
-			         DROP TABLE IF EXISTS `$db_table_name`;
-					"
+			         DROP TABLE IF EXISTS `%s`;
+					",
+					$wpdb->prefix . $this->shoot_model_table
 			        )
 			);
 		 }

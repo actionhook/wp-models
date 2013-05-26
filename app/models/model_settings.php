@@ -126,6 +126,11 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		{
 			$this->settings_fields = array_merge( $this->settings_fields, $settings );
 		}
+		
+		public function activate()
+		{
+			update_option( $this->options['wp-models']['option_name'], array( 'use_filter' => true ) );
+		}
 	}
 endif;
 ?>
