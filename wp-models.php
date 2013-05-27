@@ -12,7 +12,7 @@
 Plugin Name: WP Models Pro
 Plugin URI: http://actionhook.com/wp-models
 Description: WP-Models Pro is a plugin designed for modeling agencies, model sites, or individuals that want an elegant solution to showcase themselves. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
-Version: 0.1
+Version: 1.0
 Author: ActionHook <plugins@actionhook.com>
 License: GPL2
  
@@ -51,7 +51,7 @@ if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
 	
 	require_once( 'app/controllers/plugin_controller.php' );
 	
-	$WP_Models = new WP_Models( 'wp-models', '0.1', plugin_dir_path( __FILE__ ), __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
+	$WP_Models = new WP_Models( 'wp-models', '1.0', plugin_dir_path( __FILE__ ), __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
 	
 	require_once( 'wp-models-template-tags.php' );
 }
