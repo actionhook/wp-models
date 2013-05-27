@@ -41,11 +41,16 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 * @since 0.1
 	 	 */
 	 	public function init()
-	 	{
+	 	{	
 	 		//require necessary files
 	 		require_once( $this->app_models_path . '/model_cpt_models.php' );
 	 		require_once( $this->app_models_path . '/model_cpt_shoots.php' );
 	 		require_once( $this->app_models_path . '/model_settings.php' );
+	 		require_once( $this->path . 'lib/edd/edd_updater.php' );
+	 		
+	 		//setup our nonce name and action
+	 		$this->nonce_name = '_wp_models_nonce';
+	 		$this->nonce_action = '5tyhjDR%6%$%^&*IuhbnmknbGTRFGHJN';
 	 		
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
 	 		define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
@@ -59,9 +64,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			_WP_MODELS_CPT_SHOOTS_SLUG => new WP_Models_CPT_Shoots_Model( $this->uri, $this->txtdomain )
 	 		);
 	 		
-	 		//setup our nonce name and action
-	 		$this->nonce_name = '_wp_models_nonce';
-	 		$this->nonce_action = '5tyhjDR%6%$%^&*IuhbnmknbGTRFGHJN';
 	 		$this->add_actions_and_filters();
 	 	}
 	 	
@@ -77,14 +79,17 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		add_filter( 'filter_metabox_callback_args', array( &$this, 'setup_metabox_args' ), 10, 2 );
 	 		
 	 		//add our ajax callbacks
-	 		add_action( 'wp_ajax_wp_models_media_upload', 		array( &$this, 'ajax_media_upload' ) );
-	 		add_action( 'wp_ajax_wp_models_get_media', 			array( &$this, 'ajax_get_media_admin' ) );
-	 		add_action( 'wp_ajax_nopriv_wp_models_get_media', 	array( &$this, 'ajax_get_media' ) );
-	 		add_action( 'wp_ajax_wp_models_delete_shoot_pic', 	array( &$this, 'ajax_delete_media' ) );
-	 		add_action( 'wp_ajax_wp_models_delete_shoot_vid', 	array( &$this, 'ajax_delete_media' ) );
+	 		add_action( 'wp_ajax_wp_models_media_upload', 			array( &$this, 'ajax_media_upload' ) );
+	 		add_action( 'wp_ajax_wp_models_get_media', 				array( &$this, 'ajax_get_media_admin' ) );
+	 		add_action( 'wp_ajax_nopriv_wp_models_get_media', 		array( &$this, 'ajax_get_media' ) );
+	 		add_action( 'wp_ajax_wp_models_delete_shoot_pic', 		array( &$this, 'ajax_delete_media' ) );
+	 		add_action( 'wp_ajax_wp_models_delete_shoot_vid', 		array( &$this, 'ajax_delete_media' ) );
+	 		add_action( 'wp_ajax_wp_models_activate_license_key',	array( &$this, 'ajax_activate_license' ) );
+	 		add_action( 'wp_ajax_wp_models_deactivate_license_key',	array( &$this, 'ajax_deactivate_license' ) );
 	 		
 	 		//filter the wp-models-admin-cpt js localization args
 	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-cpt',	array( &$this, 'filter_admin_cpt_js' ) );
+	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-settings',	array( &$this, 'filter_admin_cpt_js' ) );
 	 		
 	 		//filter css as necessary
 	 		add_filter( 'ah_base_filter_styles-flowplayer', array( &$this, 'filter_flowplayer_css' ) );
@@ -163,6 +168,80 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	{
 	 		$view = trailingslashit( $this->app_views_path ) . 'ajax_'. $_POST['media_type'] . '_html.php';
 	 		die( $this->render_media( $_POST['post'], $_POST['post_type'], $_POST['media_type'], $view ) );
+	 	}
+	 	
+	 	/**
+	 	 * Activate the plugin license
+	 	 *
+	 	 * @package pkgtoken
+	 	 * @since 0.1
+	 	 */
+	 	public function ajax_activate_license()
+	 	{
+	 		//check for security
+	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
+	 			die( 'Security check failed' );
+	 			
+	 		if( ! class_exists( 'EDD_Interface' ) )
+	 			require_once( $this->path . '/lib/edd/edd_interface.php' );
+	 		
+	 		$args = array( 'version' => $this->version );
+	 		$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
+ 			
+	 		$status = $edd->activate_license( $_POST['key'], 'WP Models Pro' );
+
+ 			$txtdomain = $this->txtdomain;
+ 			
+ 			if ( $status == 'valid' ):
+ 				$message = __( 'License Key activated.', $this->txtdomain );
+ 				$file = 'admin_ajax_license_key_active.php';
+ 				update_option( 'wp_models_license_status', $status );
+ 			elseif ( $status == false ):
+ 				$message = __('There was an error contacting the license server. Please try again later.', $this->txtdomain );
+ 				$file = 'admin_ajax_license_key_inactive.php';
+ 			else:
+ 				$message = __( 'License key invalid.', $this->txtdomain );
+ 				$file = 'admin_ajax_license_key_inactive.php';
+	 		endif;
+	 		
+	 		die( require_once( $this->app_views_path . $file ) );
+	 	}
+	 	
+	 	/**
+	 	 * Activate the plugin license
+	 	 *
+	 	 * @package pkgtoken
+	 	 * @since 0.1
+	 	 */
+	 	public function ajax_deactivate_license()
+	 	{
+	 		//check for security
+	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
+	 			die( 'Security check failed' );
+	 			
+	 		if( ! class_exists( 'EDD_Interface' ) )
+	 			require_once( $this->path . '/lib/edd/edd_interface.php' );
+	 		
+	 		$args = array( 'version' => $this->version );
+	 		$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
+ 			
+	 		$status = $edd->deactivate_license( $_POST['key'], 'WP Models Pro' );
+	 		
+ 			$txtdomain = $this->txtdomain;
+ 			
+ 			if ( $status == 'deactivated' ):
+ 				$message = __( 'License Key deactivated.', $this->txtdomain );
+ 				$file = 'admin_ajax_license_key_inactive.php';
+ 				update_option( 'wp_models_license_status', $status );
+ 			elseif ( $status == false ):
+ 				$message = __('There was an error contacting the license server. Please try again later.', $this->txtdomain );
+ 				$file = 'admin_ajax_license_key_active.php';
+ 			else:
+ 				$message = __( 'License key invalid.', $this->txtdomain );
+ 				$file = 'admin_ajax_license_key_active.php';
+	 		endif;
+	 		
+	 		die( require_once( $this->app_views_path . $file ) );
 	 	}
 	 	
 	 	/**
