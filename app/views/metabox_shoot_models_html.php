@@ -6,11 +6,11 @@
  *
  * @package WP Models\Views
  * @version 0.1
- * @author ActionHopk.com <plugins@actionhook.com>
+ * @author ActionHook.com <plugins@actionhook.com>
  * @since WP-Models 0.1
  */
 echo $nonce;
-if( isset( $metabpx['args']['models'] ) && is_array( $metabpx['args']['models'] ) ):
+if( isset( $metabox['args']['models'] ) && is_array( $metabox['args']['models'] ) ):
 	foreach( $metabox['args']['models'] as $key => $model ):
 		if( is_array( $metabox['args']['shoot_models'] ) ):
 			$checked = in_array( $key, $metabox['args']['shoot_models'] ) ? ' checked' : '';
