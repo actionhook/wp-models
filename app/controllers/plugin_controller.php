@@ -101,7 +101,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 			$this->settings_model->get_settings( 'wp_models_general', 'use_filter' );
 			
 			if ( $this->settings_model->get_settings( 'wp_models_general', 'use_filter' ) )
-				add_filter( 'the_content',	array( &$this, 'render_single_view' ) );
+				add_filter( 'the_content',	array( &$this, 'render_single_view' ), 100 );
 				
 	 	}
 	 	
