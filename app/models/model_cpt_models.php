@@ -543,6 +543,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 	 		
 			if ( is_dir( $target ) ):
 				if ( $files = scandir( $target ) ):
+					$contents = null;
 					foreach( $files as $entry ):
 						$filetype = wp_check_filetype( $entry );
 						if( in_array( $filetype['ext'], $valid_types ) )
