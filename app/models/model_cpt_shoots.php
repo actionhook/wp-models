@@ -22,7 +22,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
  
-if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
+if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 	/**
 	 * The WP Models Shoots CPT Model
 	 *
@@ -113,7 +113,6 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 				'description'         	=> __( 'Shoots', $txtdomain ),
 				'labels'              	=> $labels,
 				'supports'            	=> array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' ),
-				'taxonomies'          	=> null,
 				'hierarchical'        	=> false,
 				'public'              	=> true,
 				'show_ui'             	=> true,
@@ -171,6 +170,17 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 					) 
 				),
 				new Base_Model_Metabox(
+					self::$slug . '-shoot-pics-uploader',
+					__( 'Shoot Pictures Uploader', $txtdomain ),
+					null,
+					self::$slug,
+					'normal',
+					'high',
+					array (
+						'view' => 'metabox_pics_uploader_html.php'
+					) 
+				),
+				new Base_Model_Metabox(
 					self::$slug . '-vids',
 					__( 'Shoot Videos', $txtdomain ),
 					null,
@@ -179,6 +189,17 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 					'high',
 					array (
 						'view' => 'metabox_vids_html.php'
+					) 
+				),
+				new Base_Model_Metabox(
+					self::$slug . '-shoot-vids-uploader',
+					__( 'Shoot Videos Uploader', $txtdomain ),
+					null,
+					self::$slug,
+					'normal',
+					'high',
+					array (
+						'view' => 'metabox_vids_uploader_html.php'
 					) 
 				)
 			);
@@ -230,45 +251,40 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 			$uri = trailingslashit( $uri );
 			
 			$this->admin_scripts = array(
-	 			array(
-	 				'handle' => 'jquery-plupload-queue',
-	 				'src' => $uri . 'plupload/jquery.plupload.queue/jquery.plupload.queue.js',
-	 				'deps' => array( 'plupload-all' ),
-	 				'ver' => '1.5.7',
-	 				'in_footer' => false
+	 			new Base_Model_JS_Object(
+	 				'jquery-plupload-queue',
+	 				$uri . 'plupload/jquery.plupload.queue/jquery.plupload.queue.js',
+	 				array( 'plupload-all' ),
+	 				'1.5.7',
+	 				false
 	 			),
-	 			array(
-					'handle' => 'colorbox',
-					'src' => $uri . 'colorbox/jquery.colorbox-min.js',
-					'deps' => array( 'jquery' ),
-					'ver' => '1.4.15',
-					'in_footer' => false
+	 			new Base_Model_JS_Object(
+					'colorbox',
+					$uri . 'colorbox/jquery.colorbox-min.js',
+					array( 'jquery' ),
+					'1.4.15',
+					false
 				),
-	 			array(
-		 			'handle' => 'wp-models-admin-cpt',
-		 			'src' => $uri . 'wp-models-admin-cpt.js',
-		 			'deps' => array( 'jquery-plupload-queue', 'colorbox' ),
-		 			'ver' => false,
-		 			'in_footer' => true
-	 			),
-	 			array(
-	 				'handle' => 'flowplayer',
-	 				'src' => $uri . 'flowplayer/flowplayer.js',
-	 				'deps' => array( 'jquery' ),
-	 				'ver' => '5.4.17',
-	 				'in_footer' => false
-	 			)
-	 		);
-	 		$this->admin_scripts_l10n = array(
-	 			array(
-	 				'script' => 'wp-models-admin-cpt',
-	 				'var' => 'wpModelsL10n',
-	 				'args' => array(
+	 			new Base_Model_JS_Object(
+		 			'wp-models-admin-cpt',
+		 			$uri . 'wp-models-admin-cpt.js',
+		 			array( 'jquery-plupload-queue', 'colorbox' ),
+		 			false,
+		 			true,
+		 			'wpModelsL10n',
+		 			array(
 	 					'storage' => 'local',	//deafult to local. Set later by plugin controller
 	 					'url' => admin_url( 'admin-ajax.php' ),
 	 					'post_id' => $post->ID,
 	 					'post_type' => self::$slug
 	 				)
+	 			),
+	 			new Base_Model_JS_Object(
+	 				'flowplayer',
+	 				$uri . 'flowplayer/flowplayer.js',
+	 				array( 'jquery' ),
+	 				'5.4.17',
+	 				false
 	 			)
 	 		);
 		}
@@ -328,26 +344,26 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 			$uri = trailingslashit( $uri );
 			
 			$this->scripts = array(
-				array(
-					'handle' => 'colorbox',
-					'src' => $uri . 'colorbox/jquery.colorbox.js',
-					'deps' => array( 'jquery' ),
-					'ver' => '1.4.15',
-					'in_footer' => false
+				new Base_Model_JS_Object(
+					'colorbox',
+					$uri . 'colorbox/jquery.colorbox.js',
+					array( 'jquery' ),
+					'1.4.15',
+					false
 				),
-				array(
-					'handle' => 'flowplayer',
-					'src' => $uri . 'flowplayer/flowplayer.min.js',
-					'deps' => array( 'jquery' ),
-					'ver' => '5.4.1',
-					'in_footer' => false
+				new Base_Model_JS_Object(
+					'flowplayer',
+					$uri . 'flowplayer/flowplayer.min.js',
+					array( 'jquery' ),
+					'5.4.1',
+					false
 				),
-				array(
-					'handle' => 'wp-models-single-model',
-					'src' => $uri . 'wp-models-single.js',
-					'deps' => array( 'colorbox', 'flowplayer' ),
-					'ver' => false,
-					'in_footer' => false
+				new Base_Model_JS_Object(
+					'wp-models-single-model',
+					$uri . 'wp-models-single.js',
+					array( 'colorbox', 'flowplayer' ),
+					false,
+					false
 				)
 			);
 		}
@@ -447,7 +463,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 *
 		 * @package WP Models\Models
 		 * @param string $shoot_id the post ID of the shoot
-		 * @return array $models An array containing the post id's of the models in the shoot.
+		 * @return array|false $models An array containing the post id's of the models in the shoot. FALSE on no models.
 		 * @since 0.1
 		 */
 		public function get_shoot_models( $shoot_id )
@@ -464,9 +480,11 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 				foreach( $shoot_models as $model ):
 					$model_id[] = $model['model_id'];
 				endforeach;
+				
+				return $model_id;
+			else:
+				return false;
 			endif;
-	
-			return $model_id;
 		}
 		
 		/**
@@ -626,7 +644,11 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 				endif;
 			endif;
 			
-			return $contents;
+			if( isset( $contents ) ):
+				return $contents;
+			else:
+				return false;
+			endif;
 		}
 		
 		/**
@@ -720,7 +742,7 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 * @param string $location The storage location.
 		 * @since 0.1
 		 */
-		public function delete_media( $post_id, $media, $media_type, $location )
+		public function delete_media( $post_id, $media, $media_type, $location = 'local' )
 		{
 			switch( $location )
 			{
@@ -746,14 +768,15 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 			$wpdb->query( 
 				$wpdb->prepare( 
 					"
-			         CREATE TABLE IF NOT EXISTS `$db_table_name`  (
+			         CREATE TABLE IF NOT EXISTS `%s`  (
 						`shoot_id` int(11) NOT NULL DEFAULT '0',
 						`model_id` int(11) NOT NULL DEFAULT '0',
 						PRIMARY KEY (`model_id`,`shoot_id`),
 						KEY `model_id` (`model_id`),
 						KEY `shoot_id` (`shoot_id`)
 					) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-					"
+					",
+					$wpdb->prefix . $this->shoot_model_table
 			        )
 			);
 		}
@@ -772,8 +795,9 @@ if ( ! class_exists( WP_Models_CPT_Shoots_Model ) ):
 		 	$wpdb->query( 
 				$wpdb->prepare( 
 					"
-			         DROP TABLE IF EXISTS `$db_table_name`;
-					"
+			         DROP TABLE IF EXISTS `%s`;
+					",
+					$wpdb->prefix . $this->shoot_model_table
 			        )
 			);
 		 }

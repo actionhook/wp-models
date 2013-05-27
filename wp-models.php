@@ -9,9 +9,9 @@
  */
 
 /*
-Plugin Name: WP Models
+Plugin Name: WP Models Pro
 Plugin URI: http://actionhook.com/wp-models
-Description: A plugin to add models and photo shoots. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
+Description: WP-Models Pro is a plugin designed for modeling agencies, model sites, or individuals that want an elegant solution to showcase themselves. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
 Version: 0.1
 Author: ActionHook <plugins@actionhook.com>
 License: GPL2
