@@ -63,7 +63,9 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 					'menu_slug'		=> 'wp-models-options',
 					'icon_url'		=> null,
 					'callback'		=> null,
+					'view'			=> 'admin_options.php',
 					'js'			=> array( new Base_Model_JS_Object( 'wp-models-admin-settings', $uri . 'js/wp-models-admin-settings.js', array( 'jquery' ), false, false, 'wpModelsL10n' ) ),
+					'css'			=> array( array( 'handle' => 'wp-models-admin-settings', 'src' => $uri . 'css/wp-models-admin-settings.css', 'deps' => null, 'ver' => false, 'media' => 'all' ) ),
 					'help_screen'	=> array(
 							new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-settings-help', null, null, $path . 'help_screen_settings_general.php' )
 					),
