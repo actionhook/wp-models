@@ -434,7 +434,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 *
 		 * @package WP Models\Controllers
 		 * @since 0.1
-		 * @todo add routine to set the default settings
 		 */
 		public static function activate()
 		{
@@ -451,7 +450,11 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	public static function delete()
 	 	{
 	 		//delete the shoot models table
-			//delete the uploads directory
+			//delete the wp-models uploads directory
+			
+			//delete the plugin options
+			delete_option( 'wp_models_license_status' );
+			delete_option( 'wp_models_general' );
 	 	}
 	 }
 endif;
