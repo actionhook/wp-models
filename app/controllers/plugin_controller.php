@@ -59,7 +59,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 				'version' 	=> $this->version
 			);
 			
-	 		$this->updater = new EDD_Interface( 'http://actionhook.com/', $this->main_plugin_file, $args );
+	 		$this->updater = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
 	 		
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
@@ -114,6 +114,8 @@ if ( ! class_exists( 'WP_Models' ) ):
 				
 				
 			add_action( 'update_option_wp_models_general', array( &$this, 'update_option_wp_models_general' ),10,2 );
+			
+			register_activation_hook( $this->main_plugin_file, array( &$this, 'activate' ) );
 				
 	 	}
 	 	
@@ -198,9 +200,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			require_once( $this->path . '/lib/edd/edd_interface.php' );
 	 		
 	 		$args = array( 'version' => $this->version );
-	 		$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
+	 		//$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
  			
-	 		$status = $edd->activate_license( $_POST['key'], 'WP Models Pro' );
+	 		$status = $this->updater->activate_license( $_POST['key'], 'WP Models Pro' );
 
  			$txtdomain = $this->txtdomain;
  			
@@ -236,9 +238,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			require_once( $this->path . '/lib/edd/edd_interface.php' );
 	 		
 	 		$args = array( 'version' => $this->version );
-	 		$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
+	 		//$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
  			
-	 		$status = $edd->deactivate_license( $_POST['key'], 'WP Models Pro' );
+	 		$status = $this->updater->deactivate_license( $_POST['key'], 'WP Models Pro' );
 	 		
  			$txtdomain = $this->txtdomain;
  			
@@ -451,7 +453,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 */
 		public function activate()
 		{
-			$status = $this->EDD_Interface->check_license()
+			$status = $this->updater->check_license();
 			$this->settings_model->update_license_status( $status );
 		}
 		

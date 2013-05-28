@@ -70,11 +70,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 							new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-settings-help', null, null, $path . 'help_screen_settings_general.php' )
 					),
 					'admin_notices' => array(
-<<<<<<< .working
-						get_option( 'wp_models_license_status', 'Not activated' ) == 'valid' ?
-=======
 						get_option( 'wp_models_license_status', 'not activated' ) == 'valid' ?
->>>>>>> .merge-right.r130
 							'<div id="wp-models-license-status-message-admin" class="updated"><p>' . __( 'License status: Active', $txtdomain ) . '</p></div>' :
 							'<div id="wp-models-license-status-message-admin" class="error"><p>' . sprintf( __( 'License status: %s', $txtdomain ), get_option( 'wp_models_license_status', __( 'not activated.', $txtdomain ) ) ) . '</p></div>'
 					)
@@ -178,15 +174,13 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		{
 			$options = get_option( $this->options['wp-models']['option_name'] );
 			
-			if( ! isset( $options['use_filter'] )
-				$options'use_filter' =>true; 
+			if( ! isset( $options['use_filter'] ) )
+				$options['use_filter'] = true; 
 			
-			if( ! isset( $options['flowplayer_style'] )
-				'flowplayer_style' = 1;
+			if( ! isset( $options['flowplayer_style'] ) )
+				$options['flowplayer_style'] = 1;
 			
 			update_option( $this->options['wp-models']['option_name'], $options );
-			
-			$status = get_option( 'wp_models_liense_status' );
 		}
 		
 		/**
