@@ -63,7 +63,9 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 					'menu_slug'		=> 'wp-models-options',
 					'icon_url'		=> null,
 					'callback'		=> null,
+					'view'			=> 'admin_options.php',
 					'js'			=> array( new Base_Model_JS_Object( 'wp-models-admin-settings', $uri . 'js/wp-models-admin-settings.js', array( 'jquery' ), false, false, 'wpModelsL10n' ) ),
+					'css'			=> array( array( 'handle' => 'wp-models-admin-settings', 'src' => $uri . 'css/wp-models-admin-settings.css', 'deps' => null, 'ver' => false, 'media' => 'all' ) ),
 					'help_screen'	=> array(
 							new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-settings-help', null, null, $path . 'help_screen_settings_general.php' )
 					),
@@ -144,29 +146,47 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 			add_action( 'update_option_wp_models_general', array( &$this, 'update_option_wp_models_general' ),10,2 );
 		}
 		
+		/**
+		 * The options sanitization callback
+		 *
+		 * @package WP Models\Models
+		 * @param array $input The POSTed data.
+		 * @return array The sanitized input.
+		 * @since 0.1
+		 */
 		public function sanitize_input( $input )
 		{
 			if( isset( $input['flowplayer_style'] ) && ! in_array( $input['flowplayer_style'], array( 1,2,3 ) ) )
 				$input['flowplayer_style'] = 1;
 			
+			foreach( $input as $key => $value ):
+				$input[$key] = sanitize_text_field( $value );
+			endforeach;
+				
 			return $input;
 		}
 		
-		public function add_settings_section( $section )
-		{
-			$this->settings_sections = array_merge( $this->settings_sections, $section );
-		}
-		
-		public function add_settings_field( $settings )
-		{
-			$this->settings_fields = array_merge( $this->settings_fields, $settings );
-		}
-		
+		/**
+		 * Run on plugin activation.
+		 *
+		 * @package WP Models\Models
+		 * @since 0.1
+		 */
 		public function activate()
 		{
 			update_option( $this->options['wp-models']['option_name'], array( 'use_filter' => true, 'flowplayer_style' => 1 ) );
 		}
 		
+		/**
+		 * The update_option_wp_models_general action callback.
+		 *
+		 * This performs a license check every time the WP Models options are saved and stores the results.
+		 *
+		 * @package WP Models\Models
+		 * @param array $old_value The values currently stored.
+		 * @param array $new_value The POSTed values.
+		 * @since 0.1
+		 */
 		public function update_option_wp_models_general( $old_value, $new_value )
 		{
 			global $WP_Models;
@@ -179,7 +199,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 			
 	 		$license_status = $edd->check_license( 
 	 			$new_value['license_key'], 'WP Models Pro' );
-	 		//die( print_r($license_status ));
+	 		
 			update_option( 'wp_models_license_status', $license_status );
 		}
 	}
