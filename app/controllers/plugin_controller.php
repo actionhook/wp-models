@@ -173,7 +173,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * Activate the plugin license
 	 	 *
-	 	 * @package pkgtoken
+	 	 * @package WP Models\Controllers
 	 	 * @since 0.1
 	 	 */
 	 	public function ajax_activate_license()
@@ -210,7 +210,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * Activate the plugin license
 	 	 *
-	 	 * @package pkgtoken
+	 	 * @package WP Models\Controllers
 	 	 * @since 0.1
 	 	 */
 	 	public function ajax_deactivate_license()
