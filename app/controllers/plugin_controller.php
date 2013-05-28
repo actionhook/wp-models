@@ -449,8 +449,10 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 * @package WP Models\Controllers
 		 * @since 0.1
 		 */
-		public static function activate()
+		public function activate()
 		{
+			$status = $this->EDD_Interface->check_license()
+			$this->settings_model->update_license_status( $status );
 		}
 		
 		/**
