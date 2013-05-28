@@ -48,17 +48,26 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		require_once( $this->app_models_path . '/model_settings.php' );
 	 		require_once( $this->path . 'lib/edd/edd_updater.php' );
 	 		
+	 		//get the plugin settings
+	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
+	 		
+	 		//initialize the updater
+	 		$args = array(
+	 			'license' 	=> $this->settings_model->get_license_key(),
+				'item_name'	=> 'WP Models Pro',
+				'author'	=> 'ActionHook.com',
+				'version' 	=> $this->version
+			);
+			
+	 		$this->updater = new EDD_Interface( 'http://actionhook.com/', $this->main_plugin_file, $args );
+	 		
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
 	 		$this->nonce_action = '5tyhjDR%6%$%^&*IuhbnmknbGTRFGHJN';
 	 		
+	 		//set up the plugin custom post types
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
 	 		define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
-	 			
-	 		//get the plugin settings
-	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
-			
-	 		//set up the plugin custom post types
 	 		$this->cpts = array(
 	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain ),
 	 			_WP_MODELS_CPT_SHOOTS_SLUG => new WP_Models_CPT_Shoots_Model( $this->uri, $this->txtdomain )
@@ -198,13 +207,14 @@ if ( ! class_exists( 'WP_Models' ) ):
  			if ( $status == 'valid' ):
  				$message = __( 'License Key activated.', $this->txtdomain );
  				$file = 'admin_ajax_license_key_active.php';
- 				update_option( 'wp_models_license_status', $status );
+ 				$this->settings_model->update_license_status( $status );
  			elseif ( $status == false ):
  				$message = __('There was an error contacting the license server. Please try again later.', $this->txtdomain );
  				$file = 'admin_ajax_license_key_inactive.php';
  			else:
  				$message = __( 'License key invalid.', $this->txtdomain );
  				$file = 'admin_ajax_license_key_inactive.php';
+ 				$this->settings_model->update_license_status( $status );
 	 		endif;
 	 		
 	 		die( require_once( $this->app_views_path . $file ) );
@@ -235,13 +245,14 @@ if ( ! class_exists( 'WP_Models' ) ):
  			if ( $status == 'deactivated' ):
  				$message = __( 'License Key deactivated.', $this->txtdomain );
  				$file = 'admin_ajax_license_key_inactive.php';
- 				update_option( 'wp_models_license_status', $status );
+ 				$this->settings_model->update_license_status( $status );
  			elseif ( $status == false ):
  				$message = __('There was an error contacting the license server. Please try again later.', $this->txtdomain );
  				$file = 'admin_ajax_license_key_active.php';
  			else:
  				$message = __( 'License key invalid.', $this->txtdomain );
  				$file = 'admin_ajax_license_key_active.php';
+ 				$this->settings_model->update_license_status( $status );
 	 		endif;
 	 		
 	 		die( require_once( $this->app_views_path . $file ) );
@@ -471,18 +482,11 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 * @since 0.1
 		 */
 		public function update_option_wp_models_general( $old_value, $new_value )
-		{
-			
-			$args = array(
-				'version' => $this->get_version()
-			);
-			
-			$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file(), $args );
-			
-	 		$license_status = $edd->check_license( 
-	 			$new_value['license_key'], 'WP Models Pro' );
-	 		
-			$this->settings_model->update_license_status( $license_status );
+		{	
+			if( isset( $new_value['license_key'] ) ):
+	 			$license_status = $this->updater->check_license( $new_value['license_key'], 'WP Models Pro' );
+				$this->settings_model->update_license_status( $license_status );
+			endif;
 		}
 	 }
 endif;

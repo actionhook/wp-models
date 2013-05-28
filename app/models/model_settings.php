@@ -186,7 +186,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		 */
 		public function update_license_status( $status )
 		{	
-			update_option( 'wp_models_license_status', $license_status );
+			update_option( 'wp_models_license_status', $status );
 		}
 		
 		/**
@@ -198,6 +198,15 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		public function get_license_status()
 		{
 			return get_option( 'wp_models_license_status', 'not activated' );
+		}
+		public function get_license_key()
+		{
+			$options = get_option( 'wp_models_general' );
+			$key = null;
+			if( isset( $options['license_key'] ) )
+				$key = $options['license_key'];
+			
+			return $key;
 		}
 	}
 endif;
