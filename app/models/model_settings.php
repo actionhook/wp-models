@@ -70,7 +70,11 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 							new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-settings-help', null, null, $path . 'help_screen_settings_general.php' )
 					),
 					'admin_notices' => array(
+<<<<<<< .working
 						get_option( 'wp_models_license_status', 'Not activated' ) == 'valid' ?
+=======
+						get_option( 'wp_models_license_status', 'not activated' ) == 'valid' ?
+>>>>>>> .merge-right.r130
 							'<div id="wp-models-license-status-message-admin" class="updated"><p>' . __( 'License status: Active', $txtdomain ) . '</p></div>' :
 							'<div id="wp-models-license-status-message-admin" class="error"><p>' . sprintf( __( 'License status: %s', $txtdomain ), get_option( 'wp_models_license_status', __( 'not activated.', $txtdomain ) ) ) . '</p></div>'
 					)
@@ -142,8 +146,6 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 					)
 				)
 			);
-			
-			add_action( 'update_option_wp_models_general', array( &$this, 'update_option_wp_models_general' ),10,2 );
 		}
 		
 		/**
@@ -183,24 +185,32 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		 * This performs a license check every time the WP Models options are saved and stores the results.
 		 *
 		 * @package WP Models\Models
-		 * @param array $old_value The values currently stored.
-		 * @param array $new_value The POSTed values.
+		 * @param $status The license status.
 		 * @since 0.1
 		 */
-		public function update_option_wp_models_general( $old_value, $new_value )
+		public function update_license_status( $status )
+		{	
+			update_option( 'wp_models_license_status', $status );
+		}
+		
+		/**
+		 * Get the plugin license status.
+		 *
+		 * @package pkgtoken
+		 * @since 
+		 */
+		public function get_license_status()
 		{
-			global $WP_Models;
+			return get_option( 'wp_models_license_status', 'not activated' );
+		}
+		public function get_license_key()
+		{
+			$options = get_option( 'wp_models_general' );
+			$key = null;
+			if( isset( $options['license_key'] ) )
+				$key = $options['license_key'];
 			
-			$args = array(
-				'version' => $WP_Models->get_version()
-			);
-			
-			$edd = new EDD_Interface( 'http://actionhook.com', $WP_Models->main_plugin_file(), $args );
-			
-	 		$license_status = $edd->check_license( 
-	 			$new_value['license_key'], 'WP Models Pro' );
-	 		
-			update_option( 'wp_models_license_status', $license_status );
+			return $key;
 		}
 	}
 endif;
