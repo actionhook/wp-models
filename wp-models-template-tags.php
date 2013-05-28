@@ -268,4 +268,56 @@ function wp_models_media_mimetype( $echo = true )
 	endif;
 }
 
+/**
+ * Display or retrieve the unfiltered shoot content.
+ *
+ * This function may only be used within The Loop.
+ *
+ * @package WP Models\Template Tags
+ * @param bool $echo Echo the string (TRUE) or return it (FALSE).
+ * @return string $content The unfiltered post content.
+ * @since WP Models 0.1
+ */
+function wp_models_shoot_content( $echo = true )
+{
+	global $post;
+	
+	if( $echo ) :
+		echo do_shortcode( $post->shoot_content );
+	else :
+		return do_shortcode( $post->shoot_content );
+	endif;
+}
+
+/**
+ * Echo a comma separated list of models attached to a shoot.
+ *
+ * This can be filtered using the wp_models_shoot_models filter.
+ * Example:
+ * <code>
+ * </code>
+ *
+ * @package WP Models\Template Tags
+ * @since 0.1
+ */
+function wp_models_shoot_models( $echo = true )
+{
+	global $post;
+	
+	if( isset ( $post->shoot_models ) && is_array( $post->shoot_models ) ):
+		$models = '';
+		foreach( $post->shoot_models as $key => $model ):
+			$model_post = get_post( $model );
+			
+			$models .= $key > 0 ? ', ' : '';
+			$models .= $model_post->post_title;
+		endforeach;
+	endif;
+	
+	if( $echo ):
+		echo $models;
+	else:
+		return $models;
+	endif;
+}
 ?>

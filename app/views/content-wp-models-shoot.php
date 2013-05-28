@@ -9,11 +9,11 @@
  */
 ?>
 		<div class="wp-models-shoot-info">
-			<p>Age: <?php wp_models_model_age(); ?> | Height: <?php wp_models_model_height(); ?>  | Weight: <?php wp_models_model_weight(); ?>  | <?php wp_models_model_bust(); ?>-<?php wp_models_model_waist(); ?>-<?php wp_models_model_hips(); ?></p>
+			<p>Shot on <?php the_date(); ?> with <?php wp_models_shoot_models(); ?></p>
 		</div>
 		<div class="wp-models-toggle-container">
-			<div class="wp-models-shoot-content">
-				<?php wp_models_model_content(); ?>	
+			<div class="wp-models-content">
+				<?php wp_models_shoot_content(); ?>	
 			</div>
 		</div>
 		

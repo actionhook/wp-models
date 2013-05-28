@@ -418,6 +418,8 @@ if ( ! class_exists( 'WP_Models' ) ):
 					$view = trailingslashit( $this->app_views_path ) . 'content-' . $post->post_type . '.php';
 				endif;
 				
+				$txtdomain = $this->txtdomain;
+				
 				//include the view
 				ob_start();
 				require_once( $view );

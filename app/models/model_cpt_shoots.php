@@ -459,6 +459,42 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		}
 		
 		/**
+		 * WP 'the_post' action callback
+		 *
+		 * @package WP Models\Models
+		 * @param object $post The WP post object.
+		 * @param string $location The storage location.
+		 * @return $post The modified post object.
+		 * @since 0.1
+		 */
+		public function the_post( $post, $location = 'local'  )
+		{
+			if( $post->post_type == self::$slug ):
+				
+				$meta = get_post_meta( $post->ID, self::$metakey, true );
+				
+				$post->shoot_content = $post->post_content;
+				$post->shoot_models = $this->get_shoot_models( $post->ID );
+				
+				$pics = $this->get_media($post->ID, 'pics', $location);
+				if( isset( $pics ) ):
+					$post->model_pics = $pics;
+					$post->model_pic_count = count($post->model_pics);
+					$post->model_current_pic = -1;
+				endif;
+				
+				$vids = $this->get_media($post->ID, 'vids', $location);
+				if( isset( $vids ) ):
+					$post->model_vids = $vids;
+					$post->model_vid_count = count($post->model_vids);
+					$post->model_current_vid = -1;
+				endif;
+			endif;
+			
+			return $post;
+		}
+		
+		/**
 		 * Get the models in a shoot.
 		 *
 		 * @package WP Models\Models
@@ -624,6 +660,8 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 	 			$type
 	 		);
 	 		
+	 		
+	 		$contents = null;
 			if ( is_dir( $target ) ):
 				if ( $files = scandir( $target ) ):
 					foreach( $files as $entry ):
@@ -644,11 +682,11 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 				endif;
 			endif;
 			
-			if( isset( $contents ) ):
+			//if( isset( $contents ) ):
 				return $contents;
-			else:
-				return false;
-			endif;
+			//else:
+				//return false;
+			//endif;
 		}
 		
 		/**
