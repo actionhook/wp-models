@@ -103,6 +103,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 			if ( $this->settings_model->get_settings( 'wp_models_general', 'use_filter' ) )
 				add_filter( 'the_content',	array( &$this, 'render_single_view' ), 100 );
 				
+				
+			add_action( 'update_option_wp_models_general', array( &$this, 'update_option_wp_models_general' ),10,2 );
+				
 	 	}
 	 	
 	 	/**
@@ -456,5 +459,30 @@ if ( ! class_exists( 'WP_Models' ) ):
 			delete_option( 'wp_models_license_status' );
 			delete_option( 'wp_models_general' );
 	 	}
+	 	
+	 	/**
+		 * The update_option_wp_models_general action callback.
+		 *
+		 * This performs a license check every time the WP Models options are saved and stores the results.
+		 *
+		 * @package WP Models\Models
+		 * @param array $old_value The values currently stored.
+		 * @param array $new_value The POSTed values.
+		 * @since 0.1
+		 */
+		public function update_option_wp_models_general( $old_value, $new_value )
+		{
+			
+			$args = array(
+				'version' => $this->get_version()
+			);
+			
+			$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file(), $args );
+			
+	 		$license_status = $edd->check_license( 
+	 			$new_value['license_key'], 'WP Models Pro' );
+	 		
+			$this->settings_model->update_license_status( $license_status );
+		}
 	 }
 endif;
