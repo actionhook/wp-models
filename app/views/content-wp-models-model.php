@@ -12,7 +12,7 @@
 			<p>Age: <?php wp_models_model_age(); ?> | Height: <?php wp_models_model_height(); ?>  | Weight: <?php wp_models_model_weight(); ?>  | <?php wp_models_model_bust(); ?>-<?php wp_models_model_waist(); ?>-<?php wp_models_model_hips(); ?></p>
 		</div>
 		<div class="wp-models-toggle-container">
-			<div class="wp-models-model-content">
+			<div class="wp-models-content">
 				<?php wp_models_model_content(); ?>	
 			</div>
 		</div>
