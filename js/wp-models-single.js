@@ -44,7 +44,7 @@ function wp_models_init_toggle()
 	var lessText = "Less";
 	
 	// Sets the .wp-models-model-content div to the specified height and hides any content that overflows
-	jQuery(".wp-models-toggle-container .wp-models-model-content").css('height', adjustheight).css('overflow', 'hidden');
+	jQuery(".wp-models-toggle-container .wp-models-content").css('height', adjustheight).css('overflow', 'hidden');
 	
 	// The section added to the bottom of the "wp-models-toggle-container" div
 	jQuery(".wp-models-toggle-container").append('<p><a href="#" class="wp-models-toggle"></a></p>');
@@ -53,12 +53,12 @@ function wp_models_init_toggle()
 	jQuery("a.wp-models-toggle").text(moreText);
 	
 	jQuery(".wp-models-toggle").toggle(function() {
-			jQuery(this).parents("div:first").find(".wp-models-model-content").css('height', 'auto').css('overflow', 'visible');
+			jQuery(this).parents("div:first").find(".wp-models-content").css('height', 'auto').css('overflow', 'visible');
 			// Hide the [...] when expanded
 			jQuery(this).parents("div:first").find("p.continued").css('display', 'none');
 			jQuery(this).text(lessText);
 		}, function() {
-			jQuery(this).parents("div:first").find(".wp-models-model-content").css('height', adjustheight).css('overflow', 'hidden');
+			jQuery(this).parents("div:first").find(".wp-models-content").css('height', adjustheight).css('overflow', 'hidden');
 			jQuery(this).parents("div:first").find("p.continued").css('display', 'block');
 			jQuery(this).text(moreText);
 	});
