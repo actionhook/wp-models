@@ -55,10 +55,19 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 			);
 			
 			$this->pages = array(
-				'wp-models-options' => array(
-					'parent_slug'	=> 'options-general.php',
-					'page_title'	=> __( 'WP Models Options', $txtdomain ),
+				'wp-models'			=> array(
+					'page_title'	=> __( 'WP Models', $txtdomain ),
 					'menu_title'	=> __( 'WP Models', $txtdomain ),
+					'capability'	=> 'manage_options',
+					'menu_slug'		=> 'wp-models',
+					'icon_url'		=> null,
+					'callback'		=> null,
+				),
+				'wp-models-options' => array(
+					//'parent_slug'	=> 'options-general.php',
+					'parent_slug'	=> 'wp-models',
+					'page_title'	=> __( 'General Options', $txtdomain ),
+					'menu_title'	=> __( 'General Options', $txtdomain ),
 					'capability'	=> 'manage_options',
 					'menu_slug'		=> 'wp-models-options',
 					'icon_url'		=> null,
@@ -215,6 +224,12 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 				$key = $options['license_key'];
 			
 			return $key;
+		}
+		
+		public function add_settings_page( $page )
+		{
+			if( is_array( $page ) )
+				$this->pages = array_merge( $page, $this->pages );
 		}
 	}
 endif;

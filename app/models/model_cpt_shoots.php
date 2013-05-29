@@ -467,8 +467,12 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		 * @return $post The modified post object.
 		 * @since 0.1
 		 */
-		public function the_post( $post, $location = 'local'  )
+		public function the_post( $post )
 		{
+			global $WP_Models;
+			
+			$location = $WP_Models->get_current_storage_location();
+			
 			if( $post->post_type == self::$slug ):
 				
 				$meta = get_post_meta( $post->ID, self::$metakey, true );
@@ -494,6 +498,31 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 			return $post;
 		}
 		
+		public function get_media_upload_dir( $post = null, $type = null )
+		{
+			if ( ! is_null( $post ) && ! is_null( $type ) ):
+				$target = sprintf( '%1$s/%2$s/%3$s', $this->media_upload_dir, $post, $type );
+			elseif ( ! is_null( $post ) ):
+				$target = sprintf( '%1$s/%2$s', $this->media_upload_dir, $post );
+			else:
+				$target = $this->media_upload_dir;
+			endif;
+			
+			return $target;
+		}
+		
+		public function get_media_upload_uri( $post = null, $type = null )
+		{
+			if ( ! is_null( $post ) && ! is_null( $type ) ):
+				$target = sprintf( '%1$s/%2$s/%3$s', $this->media_upload_uri, $post, $type );
+			elseif ( ! is_null( $post ) ):
+				$target = sprintf( '%1$s/%2$s', $this->media_upload_uri, $post );
+			else:
+				$target = $this->media_upload_uri;
+			endif;
+			
+			return $target;
+		}
 		/**
 		 * Get the models in a shoot.
 		 *
@@ -601,7 +630,7 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		/**
 		 * Get all media of a certain type attached to the shoot.
 		 *
-		 * This function will call the appropriate content getter function based upon the $location property. This currently supports local storage as well as Amazon S3.
+		 * This function will call the appropriate content getter function based upon the $location property. 
 		 * It will return an array containing information regarding the files present. Each item in the array will itself be an array with the following elements:
 		 * 		uri- the media item uri
 		 * 		filename- the media item filename
@@ -612,25 +641,54 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		 * @param string $post_id The WP post ID.
 		 * @param string $type The media type (pics, vids). This is used to determine storage location directories.
 		 * @param string $location The storage location used by this plugin ( local, amazons3 ).
-		 * @param string $access_key The remote storage service access key.
-		 * @param string $secret_key The remote storage service secret key.
-		 * @param string $bucket The remote storage service storage location.
 		 * @return array $contents 
 		 * @since 0.1
 		 */
-		public function get_media( $post_id, $type, $location = 'local', $access_key = null, $secret_key = null , $bucket = null )
+		public function get_media( $post_id, $type, $location )
 		{
-			switch( $location ){
-				case 'amazonS3':
-					if ( is_null( $access_key ) || is_null( $secret_key) || is_null( $bucket ) )
-						return new WP_ERROR;
-					return $this->get_shoot_media_amazonS3( $post_id, $type, $access_key, $secret_key, $bucket );
-					break;
+			//set the target directory to pass to the callback
+			$target = sprintf( '%1$s/%2$s/%3$s',
+	 			untrailingslashit( $this->media_upload_dir ),
+	 			$post_id,
+	 			$type
+	 		);
+	 		
+	 		$get_callback = $location->get_get_callback();
+			
+			//get the media from the storage location using the registered callback
+	 		if( isset( $get_callback ) ):
+	 			if ( is_array( $get_callback ) ):
+	 				$media = call_user_func_array( $get_callback, array( $target ) );
+	 			elseif ( function_exists( $get_callback ) ):
+	 				$media = call_user_func( $get_callback, $target );
+	 			endif;
+	 		endif;
+	 		
+	 		$contents = null;
+	 		
+	 		//step through the contents to only include the filetypes we wish to see in this view
+			if( is_array( $media ) ):
+				//set the valid types
+				if ( 'pics' == $type ):
+					$valid_types = array( 'png', 'jpg', 'gif' );
+				else:
+					$valid_types = array( 'mp4', 'ogv', 'webm' );
+				endif;
 				
-				default:	//local storage
-					return $this->get_shoot_media_local( $post_id, $type );
-					break;
-			}
+				foreach( $media as $key => $entry ):
+					if( in_array( $entry['filetype'], $valid_types ) ):
+						$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
+							untrailingslashit( $this->media_upload_uri ),
+							$post_id,
+							$type,
+							$entry['filename']
+						);
+						$contents[] = $entry;
+					endif;
+				endforeach;
+			endif;
+			
+			return $contents;
 		}
 		
 		/**
@@ -646,7 +704,8 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
 		 * @since 0.1
 		 */
-		private function get_shoot_media_local( $post_id, $type )
+		/*
+private function get_shoot_media_local( $post_id, $type )
 		{
 			if ( 'pics' == $type ):
 				$valid_types = array( 'png', 'jpg', 'gif' );
@@ -688,6 +747,7 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 				//return false;
 			//endif;
 		}
+*/
 		
 		/**
 		 * Get shoot media stored in Amazon S3
@@ -751,23 +811,38 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		 * @package WP Models\Models
 		 * @param object $post The $_POST object.
 		 * @param object $files The $_FILES object.
+		 * @param object $location The plugin storage location object in use.
 		 * @param bool $log Log the file upload. Default is false.
 		 * @since 0.1
 		 */
-		public function save_media( $post, $files, $log = false )
+		public function save_media( $post, $files, $location, $log = false )
 		{
-			//verify the target directory/subdirectories exist and have an index.php
+			/**
+			 * @todo fix this
+			 */
+			//verify the directory/subdirectories exist and have an index.php
 			Helper_Functions::create_directory( $this->media_upload_dir );
 			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] );
 			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] . '/' . $post['type'] );
 			
 			$target = sprintf( '%1$s/%2$s/%3$s',
 	 			untrailingslashit( $this->media_upload_dir ),
-	 			$_POST['post_id'],
-	 			$_POST['type']
+	 			$post['post_id'],
+	 			$post['type']
 	 		);
 	 		
-	 		return( Helper_Functions::plupload( $_POST, $_FILES, $target, $log ) );
+	 		
+	 		$callback = $location->get_post_callback();
+	 		
+			if ( isset( $callback ) ):
+				if ( is_array( $callback )  && method_exists( $callback[0], $callback[1] ) ):
+					call_user_func_array( $callback, array( $post, $files, $target, $log ) );
+				elseif ( function_exists( $callback ) ):
+					call_user_func( $callback, $target );
+				endif;
+			endif;
+			
+	 		//Helper_Functions::plupload( $post, $files, $target, $log );
 		}
 		
 		/**
@@ -780,16 +855,18 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		 * @param string $location The storage location.
 		 * @since 0.1
 		 */
-		public function delete_media( $post_id, $media, $media_type, $location = 'local' )
+		public function delete_media( $post_id, $media, $media_type, $location )
 		{
-			switch( $location )
-			{
-				case 'local':
-					$target = trailingslashit( $this->media_upload_dir ) . trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
-					if( file_exists( $target ) )
-						return unlink( $target );
-					break;
-			}
+			$target = trailingslashit( $this->media_upload_dir ) . trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
+			
+			$callback = $location->get_delete_callback(); 
+			if ( isset( $callback ) ):
+				if ( is_array( $callback )  && method_exists( $callback[0], $callback[1] ) ):
+					call_user_func_array( $callback, array( $target ) );
+				elseif ( function_exists( $callback ) ):
+					call_user_func( $callback, $target );
+				endif;
+			endif;
 		}
 		
 		/**

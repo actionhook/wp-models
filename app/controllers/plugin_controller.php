@@ -35,6 +35,15 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 class WP_Models extends Base_Controller_Plugin
 	 {
 	 	/**
+	 	 * The storage locations available.
+	 	 *
+	 	 * @package pkgtoken
+	 	 * @var 0.1
+	 	 * @since 1.1
+	 	 */
+	 	protected $storage_locations;
+	 	
+	 	/**
 	 	 * Initialize the plugin
 	 	 *
 	 	 * @package WP Models\Controllers
@@ -51,6 +60,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		//get the plugin settings
 	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
 	 		
+	 		//intialize the storage locations
+	 		$this->init_storage();
+	 		
 	 		//initialize the updater
 	 		$args = array(
 	 			'license' 	=> $this->settings_model->get_license_key(),
@@ -58,7 +70,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 				'author'	=> 'ActionHook.com',
 				'version' 	=> $this->version
 			);
-			
 	 		$this->updater = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
 	 		
 	 		//setup our nonce name and action
@@ -74,6 +85,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		);
 	 		
 	 		$this->add_actions_and_filters();
+//print_r($this);
 	 	}
 	 	
 	 	/**
@@ -156,7 +168,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
 	 			die( 'NONCE CHECK FAILED' );
 		
-	 		$result = $this->cpts[$_POST['post_type']]->save_media( $_POST, $_FILES, true );
+	 		$result = $this->cpts[$_POST['post_type']]->save_media( $_POST, $_FILES, $this->current_storage_location, true );
 	 		die( $result );
 	 	}
 	 	
@@ -165,6 +177,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	 *
 	 	 * @package WP Models\Controllers
 		 * @since 0.1
+		 * @todo combine with function below
 	 	 */
 	 	public function ajax_get_media_admin()
 	 	{
@@ -182,6 +195,28 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	{
 	 		$view = trailingslashit( $this->app_views_path ) . 'ajax_'. $_POST['media_type'] . '_html.php';
 	 		die( $this->render_media( $_POST['post'], $_POST['post_type'], $_POST['media_type'], $view ) );
+	 	}
+	 	
+	 	/**
+	 	 * The callback for the ajax delete media handler.
+	 	 *
+	 	 * @package WP Models\Controllers
+		 * @since 0.1
+	 	 */
+	 	public function ajax_delete_media()
+	 	{
+	 		//check for security
+	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
+	 			die( 'Security check failed' );
+	 				
+	 		if ( $_POST['action'] == 'wp_models_delete_shoot_pic' ):
+	 			$type = 'pics';
+	 		elseif ( $_POST['action'] == 'wp_models_delete_shoot_vid' ):
+	 			$type = 'vids';
+	 		endif;
+	 		
+	 		$result = $this->cpts[$_POST['post_type']]->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->current_storage_location );
+	 		die( $result );
 	 	}
 	 	
 	 	/**
@@ -275,7 +310,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	public function render_media( $post_id, $post_type, $media_type, $view = null )
 	 	{
 			//get the post media
-			$post_media = $this->cpts[$post_type]->get_media( $post_id, $media_type );
+			$post_media = $this->cpts[$post_type]->get_media( $post_id, $media_type, $this->current_storage_location );
 			
 			//if we have an array of media items, include the appropriate view
 	 		if (  $post_media ):
@@ -314,28 +349,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 					break;
 	 			}
 	 		endif;
-	 	}
-	 	
-	 	/**
-	 	 * The callback for the ajax delete media handler.
-	 	 *
-	 	 * @package WP Models\Controllers
-		 * @since 0.1
-	 	 */
-	 	public function ajax_delete_media()
-	 	{
-	 		//check for security
-	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
-	 			die( 'Security check failed' );
-	 				
-	 		if ( $_POST['action'] == 'wp_models_delete_shoot_pic' ):
-	 			$type = 'pics';
-	 		elseif ( $_POST['action'] == 'wp_models_delete_shoot_vid' ):
-	 			$type = 'vids';
-	 		endif;
-	 		
-	 		$result = $this->cpts[$_POST['post_type']]->delete_media( $_POST['post_id'], $_POST['media'], $type );
-	 		die( $result );
 	 	}
 	 	
 	 	/**
@@ -409,12 +422,14 @@ if ( ! class_exists( 'WP_Models' ) ):
 				//get the post media
 				$post_pics = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
-					'pics'
+					'pics',
+					$this->current_storage_location
 				);
 				
 				$post_vids = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
-					'vids'
+					'vids',
+					$this->current_storage_location
 				);
 				
 				//add additional view variables
@@ -492,5 +507,87 @@ if ( ! class_exists( 'WP_Models' ) ):
 				$this->settings_model->update_license_status( $license_status );
 			endif;
 		}
-	 }
+		
+		public function init_storage()
+		{
+			require_once( $this->app_models_path . 'model_storage_location.php' );
+			$this->storage_locations = array(
+				'local' => new WP_Models_Model_Storage_Location( null, null, null, array( 'Helper_Functions', 'get_local_directory_contents' ), array( 'Helper_Functions', 'plupload' ), array( 'Helper_Functions', 'delete_local_file' ) )
+			);
+			
+			/**
+			 * @todo change this to a plugin setting.
+			 */
+			$this->current_storage_location = $this->storage_locations['local'];
+//print_r( $this->current_storage_location);
+		}
+		
+		/**
+		 * Get all media of a certain type attached to the post.
+		 *
+		 * This function will call the appropriate content getter function based upon the $location property. 
+		 * It will return an array containing information regarding the files present. Each item in the array will itself be an array with the following elements:
+		 * 		uri- the media item uri
+		 * 		filename- the media item filename
+		 * 		filetype- the file extension (jpg, png, etc)
+		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
+		 
+		 * @package WP Models\Controllers
+		 * @param string $post_id The WP post ID.
+		 * @param string $post_type The post type
+		 * @param string $type The media type (pics, vids). This is used to determine storage location directories.
+		 * @return array $contents 
+		 * @since 0.1
+		 */
+		private function _get_media( $post_id, $post_type, $type )
+		{
+			//set the target directory to pass to the callback
+			$upload_dir = 
+			$target = sprintf( '%1$s/%2$s/%3$s',
+	 	 		untrailingslashit( $this->cpts[$post_type]->get_media_upload_dir() ),
+	 			$post_id,
+	 			$type
+	 		);
+	 		
+	 		$get_callback = $this->current_storage_location->get_get_callback();
+			
+			//get the media from the storage location using the registered callback
+	 		if( isset( $get_callback ) ):
+	 			if ( is_array( $get_callback ) ):
+	 				$media = call_user_func_array( $get_callback, array( $target ) );
+	 			elseif ( function_exists( $get_callback ) ):
+	 				$media = call_user_func( $get_callback, $target );
+	 			endif;
+	 		endif;
+	 		
+	 		//step through the contents to only include the filetypes we wish to see in this view
+			if( is_array( $media ) ):
+				//set the valid types
+				if ( 'pics' == $type ):
+					$valid_types = array( 'png', 'jpg', 'gif' );
+				else:
+					$valid_types = array( 'mp4', 'ogv', 'webm' );
+				endif;
+				
+				foreach( $media as $key => $entry ):
+					if( in_array( $entry['filetype'], $valid_types ) ):
+						$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
+							untrailingslashit( $this->cpts[$post_type]->get_media_upload_uri() ),
+							$post_id,
+							$type,
+							$entry['filename']
+						);
+						$contents[] = $entry;
+					endif;
+				endforeach;
+			endif;
+			
+			return $contents;
+		}
+		
+		public function get_current_storage_location()
+		{
+			return $this->current_storage_location;
+		}
+	}
 endif;
