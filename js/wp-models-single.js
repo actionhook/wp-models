@@ -27,7 +27,7 @@ function wp_models_init_colorbox()
 
 function wp_models_init_player()
 {
-	jQuery('.wp-models-model-vid').flowplayer(
+	jQuery('.wp-models-vid').flowplayer(
 		{
 			swf: "flowplayer.swf"
 		}
