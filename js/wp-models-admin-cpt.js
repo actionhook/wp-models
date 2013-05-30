@@ -3,9 +3,10 @@
  *
  * @package WP Models
  * @subpackage Custom Post Types
- * @author Actionhook.com <plugins@actoinhook.com>
+ * @author Actionhook.com <plugins@actionhook.com>
  * @version 0.1
  * @since 0.1
+ * @todo internationalize the uploaders
  */
 
 jQuery(document).ready(function()
@@ -56,6 +57,16 @@ function wp_models_init_uploader_pics()
 {
 	var pics_uploader = jQuery(".wp-models-pics-uploader").pluploadQueue();
 	
+	jQuery.extend(pics_uploader.settings.filters, 
+		[{
+			title : "Image files", extensions : "jpg,gif,png"
+		}]
+	);
+	
+	pics_uploader.bind('Error', function(up, error){
+		console.log(error);
+	});
+	
 	pics_uploader.bind('BeforeUpload', function(up, file)
 	{
         
@@ -78,6 +89,12 @@ function wp_models_init_uploader_pics()
 function wp_models_init_uploader_vids()
 {
 	var vids_uploader = jQuery(".wp-models-vids-uploader").pluploadQueue();
+	
+	jQuery.extend(vids_uploader.settings.filters, 
+		[{
+			title : "Movie files", extensions : "mp4,webm,ogv"
+		}]
+	);
 	
 	vids_uploader.bind('BeforeUpload', function(up, file) 
     {
