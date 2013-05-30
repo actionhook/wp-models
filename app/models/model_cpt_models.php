@@ -581,57 +581,6 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		}
 		
 		/**
-		 * Get shoot media stored locally.
-		 *
-		 * @package WP Models\Models
-		 * @param string $post_id
-		 * @param string $type the media type (pics, vids)
-		 * @return array|bool $contents NULL on absence of media. On success, an array containing the following elements:
-		 * 		uri- the media item uri
-		 * 		filename- the media item filename
-		 * 		filetype- the file extension (jpg, png, etc)
-		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
-		 * @todo move this out to a helper lib
-		 * @since 0.1
-		 */
-		private function get_shoot_media_local( $post_id, $type )
-		{
-			if ( 'pics' == $type ):
-				$valid_types = array( 'png', 'jpg', 'gif' );
-			else:
-				$valid_types = array( 'mp4', 'ogv', 'webm' );
-			endif;
-	 		
-			if ( is_dir( $target ) ):
-				if ( $files = scandir( $target ) ):
-					$contents = null;
-					foreach( $files as $entry ):
-						$filetype = wp_check_filetype( $entry );
-						if( in_array( $filetype['ext'], $valid_types ) )
-							$contents[] = array(
-								'uri' => sprintf( '%1$s/%2$s/%3$s/%4$s',
-									untrailingslashit( $this->media_upload_uri ),
-									$post_id,
-									$type,
-									$entry
-								),
-								'filename' => $entry,
-								/**
-								 * @todo Are the following two parameters needed?
-								 */
-								'filetype' => $filetype['ext'],
-								'mimetype' => $filetype['type']
-							);
-					endforeach;
-				endif;
-				
-				return $contents;
-			else:
-				return null;
-			endif;
-		}
-		
-		/**
 		 * Save the media attached to this model
 		 *
 		 * @package WP Models\Models
@@ -640,11 +589,10 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		 * @param bool $log Log the file upload. Default is false.
 		 * @since 0.1
 		 */
-		public function save_media( $post, $files, $location, $log = false )
+		/*
+public function save_media( $post, $files, $location, $log = false )
 		{
-			/**
-			 * @todo fix this
-			 */
+			
 			//verify the directory/subdirectories exist and have an index.php
 			Helper_Functions::create_directory( $this->media_upload_dir );
 			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] );
@@ -667,6 +615,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 				endif;
 			endif;
 		}
+*/
 		
 		/**
 		 * Delete an individual item attached to this post.
@@ -678,7 +627,8 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		 * @param string $location The storage location.
 		 * @since 0.1
 		 */
-		public function delete_media( $post_id, $media, $media_type, $location )
+		/*
+public function delete_media( $post_id, $media, $media_type, $location )
 		{
 			$target = trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
 			
@@ -693,6 +643,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 			
 			return $result;
 		}
+*/
 		
 		/**
 		 * WP 'the_post' action callback

@@ -480,14 +480,14 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 				$post->shoot_content = $post->post_content;
 				$post->shoot_models = $this->get_shoot_models( $post->ID );
 				
-				$pics = $this->get_media($post->ID, 'pics', $location);
+				$pics = $this->get_media( $post->ID, 'pics', $location );
 				if( isset( $pics ) ):
 					$post->model_pics = $pics;
 					$post->model_pic_count = count($post->model_pics);
 					$post->model_current_pic = -1;
 				endif;
 				
-				$vids = $this->get_media($post->ID, 'vids', $location);
+				$vids = $this->get_media( $post->ID, 'vids', $location );
 				if( isset( $vids ) ):
 					$post->model_vids = $vids;
 					$post->model_vid_count = count($post->model_vids);
@@ -645,22 +645,15 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 		 * @since 0.1
 		 */
 		public function get_media( $post_id, $type, $location )
-		{
-			//set the target directory to pass to the callback
-			$target = sprintf( '%1$s/%2$s/%3$s',
-	 			untrailingslashit( $this->media_upload_dir ),
-	 			$post_id,
-	 			$type
-	 		);
-	 		
+		{	
 	 		$get_callback = $location->get_get_callback();
 			
 			//get the media from the storage location using the registered callback
 	 		if( isset( $get_callback ) ):
 	 			if ( is_array( $get_callback ) ):
-	 				$media = call_user_func_array( $get_callback, array( $target ) );
+	 				$media = call_user_func_array( $get_callback, array( $location->get_storage_bucket(), $post_id, $type ) );
 	 			elseif ( function_exists( $get_callback ) ):
-	 				$media = call_user_func( $get_callback, $target );
+	 				$media = call_user_func( $get_callback, $location->get_storage_bucket(), $post_id, $type );
 	 			endif;
 	 		endif;
 	 		
@@ -675,14 +668,17 @@ if ( ! class_exists( 'WP_Models_CPT_Shoots_Model' ) ):
 					$valid_types = array( 'mp4', 'ogv', 'webm' );
 				endif;
 				
+				$storage_uri = untrailingslashit( $location->get_storage_bucket_uri() );
+				
 				foreach( $media as $key => $entry ):
 					if( in_array( $entry['filetype'], $valid_types ) ):
-						$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
-							untrailingslashit( $this->media_upload_uri ),
-							$post_id,
-							$type,
-							$entry['filename']
-						);
+						if( ! isset( $entry['uri'] ) )
+							$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
+								$storage_uri,
+								$post_id,
+								$type,
+								$entry['filename']
+							);
 						$contents[] = $entry;
 					endif;
 				endforeach;
@@ -748,63 +744,7 @@ private function get_shoot_media_local( $post_id, $type )
 			//endif;
 		}
 */
-		
-		/**
-		 * Get shoot media stored in Amazon S3
-		 *
-		 * @package WP Models\Models
-		 * @param string $post_id The shoot post id.
-		 * @param string $type The media type ( pics, vids ).
-		 * @param string $access_key The remote storage service public access key.
-		 * @param string $secret_key The remote storage service secret key.
-		 * @param string $bucket The remote storage service content location.
-		 * @return array $contents An array containing the following elements:
-		 * 		uri- the media item uri
-		 * 		filename- the media item filename 
-		 * @since 0.1
-		 */
-		private function get_shoot_media_amazonS3( $post_id, $type, $access_key, $secret_key, $bucket )
-		{
-			if( ! class_exists( S3 ) )
-				return;
-			
-			//instantiate the class
-			$s3 = new S3($access_key, $secret_key);
-			
-			//get a listing of all bucket contents
-			//this will be paged.
-			/**
-			 * todo: modify to allow for truncated results
-			 */
-			$bucket_contents = $s3->getBucket( $bucket );
-			//print_r( $bucket_contents);
-			
-			foreach( $bucket_contents as $file ):
-				//print_r( $file );
-				//split the name into elements e.g. 76/pics/foo.jpg => array( [0] => '76', [1] => 'pics', [2] => 'foo' )
-				$filename = explode( '/', $file['name'] );
-				//print_r( $filename );
-				if( $filename[0] == $post_id && $filename[1] == $type ):
-					//move to this last element of the array, this will be the file name
-					end( $filename );
-					$contents[] = array(
-						'uri' => $s3->getAuthenticatedURL( $bucket, $file['name'], 3600, false, is_SSL() ),
-						'filename' => $filename[2]
-						/**
-						 * @todo Are the following elements necessary?
-						 */
-						/*
-'filetype' => $filetype['ext'],
-						'mimetype' => $filetype['type']
-*/
-					);
-				endif;
-			endforeach;
-			
-			return $contents;
-		
-		}
-		
+				
 		/**
 		 * Save the media attached to this shoot
 		 *
@@ -815,11 +755,9 @@ private function get_shoot_media_local( $post_id, $type )
 		 * @param bool $log Log the file upload. Default is false.
 		 * @since 0.1
 		 */
-		public function save_media( $post, $files, $location, $log = false )
+		/*
+public function save_media( $post, $files, $location, $log = false )
 		{
-			/**
-			 * @todo fix this
-			 */
 			//verify the directory/subdirectories exist and have an index.php
 			Helper_Functions::create_directory( $this->media_upload_dir );
 			Helper_Functions::create_directory(trailingslashit( $this->media_upload_dir ) . $post['post_id'] );
@@ -844,6 +782,7 @@ private function get_shoot_media_local( $post_id, $type )
 			
 	 		//Helper_Functions::plupload( $post, $files, $target, $log );
 		}
+*/
 		
 		/**
 		 * Delete a specific media item from this shoot.
@@ -855,7 +794,8 @@ private function get_shoot_media_local( $post_id, $type )
 		 * @param string $location The storage location.
 		 * @since 0.1
 		 */
-		public function delete_media( $post_id, $media, $media_type, $location )
+		/*
+public function delete_media( $post_id, $media, $media_type, $location )
 		{
 			$target = trailingslashit( $this->media_upload_dir ) . trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
 			

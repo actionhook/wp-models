@@ -108,9 +108,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	 */
 	 	private function add_actions_and_filters()
 	 	{
-	 		//filter metabox callback args as necessary
-	 		add_filter( 'filter_metabox_callback_args', array( &$this, 'setup_metabox_args' ), 10, 2 );
-	 		
 	 		//add our ajax callbacks
 	 		add_action( 'wp_ajax_wp_models_media_upload', 			array( &$this, 'ajax_media_upload' ) );
 	 		add_action( 'wp_ajax_wp_models_get_media', 				array( &$this, 'ajax_get_media_admin' ) );
@@ -120,24 +117,29 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		add_action( 'wp_ajax_wp_models_activate_license_key',	array( &$this, 'ajax_activate_license' ) );
 	 		add_action( 'wp_ajax_wp_models_deactivate_license_key',	array( &$this, 'ajax_deactivate_license' ) );
 	 		
-	 		//filter the wp-models-admin-cpt js localization args
-	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-cpt',	array( &$this, 'filter_admin_cpt_js' ) );
-	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-settings',	array( &$this, 'filter_admin_cpt_js' ) );
+	 		//add other callbacks
+	 		add_action( 'update_option_wp_models_general', 			array( &$this, 'update_option_wp_models_general' ),10,2 );
 	 		
+	 		//filter metabox callback args as necessary
+	 		add_filter( 'filter_metabox_callback_args', array( &$this, 'setup_metabox_args' ), 10, 2 );
+	 		
+
 	 		//filter css as necessary
-	 		add_filter( 'ah_base_filter_styles-flowplayer', array( &$this, 'filter_flowplayer_css' ) );
+	 		add_filter( 'ah_base_filter_styles-flowplayer', 		array( &$this, 'filter_flowplayer_css' ) );
 	 		
 	 		//Add additional mimetypes for video uploads
-			add_filter( 'upload_mimes', array( &$this, 'custom_mimes' ) );
+			add_filter( 'upload_mimes', 							array( &$this, 'custom_mimes' ) );
 			
+			//filter the wp-models-admin-cpt js localization args
+	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-cpt',		array( &$this, 'filter_admin_cpt_js' ) );
+	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-settings',	array( &$this, 'filter_admin_cpt_js' ) );
+	 		
 			//add content filters if so desired
 			$this->settings_model->get_settings( 'wp_models_general', 'use_filter' );
 			
 			if ( $this->settings_model->get_settings( 'wp_models_general', 'use_filter' ) )
 				add_filter( 'the_content',	array( &$this, 'render_single_view' ), 100 );
 				
-				
-			add_action( 'update_option_wp_models_general', array( &$this, 'update_option_wp_models_general' ),10,2 );
 			
 			register_activation_hook( $this->main_plugin_file, array( &$this, 'activate' ) );
 				
@@ -443,17 +445,18 @@ if ( ! class_exists( 'WP_Models' ) ):
 			global $post;
 			
 			if( is_single() && isset ( $this->cpts[$post->post_type] ) ):				
-				//get the post media
-				$post_pics = $this->cpts[$post->post_type]->get_media( 
+				/*
+//get the post media
+				$post_pics = $this->_get_media( 
 					$post->ID,
 					'pics',
-					$this->_current_storage_location
+					$this->storage_locations[$this->settings_model->get_storage_location()]
 				);
 				
-				$post_vids = $this->cpts[$post->post_type]->get_media( 
+				$post_vids = $this->_get_media( 
 					$post->ID,
 					'vids',
-					$this->_current_storage_location
+					$this->storage_locations[$this->settings_model->get_storage_location()]
 				);
 				
 				//add additional view variables
@@ -465,6 +468,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 					$post->model_waist,
 					$post->model_hips
 				);
+*/
 				
 				//this allows the user to add a content-$post_type_slug.php in their theme directory and use that.
 				if( file_exists( get_stylesheet_directory() . '/content-' . $post->post_type . '.php' ) ) :
