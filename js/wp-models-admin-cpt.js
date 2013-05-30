@@ -137,6 +137,8 @@ function wp_models_reload_pics() {
 		
 		//bind the delete media buttons
 		jQuery( '.wp-models-pic-delete' ).on( 'click', function(){
+			jQuery(this).next().toggle();
+			
 			var wpm_data = {
 				action: 'wp_models_delete_shoot_pic',
 				nonce: wpModelsL10n.nonce,
@@ -145,9 +147,8 @@ function wp_models_reload_pics() {
 				media_type: 'pics',
 				media: jQuery( this ).val()
 			};
-			jQuery(this).html( "Deleting..." );
+			
 			jQuery.post( ajaxurl, wpm_data, function( response ){
-	console.log(response);
 				wp_models_reload_pics();
 			});
 		});
@@ -165,8 +166,10 @@ function wp_models_reload_vids() {
 	
 	jQuery.post( ajaxurl, wpm_data, function( response ) {
 		jQuery('#wp-models-vids-container').html( response );
-			
+		
 		jQuery( '.wp-models-vid-delete' ).on( 'click', function() {
+			jQuery(this).next().toggle();
+			
 			var wpm_data = {
 				action: 'wp_models_delete_shoot_vid',
 				nonce: wpModelsL10n.nonce,
@@ -175,7 +178,7 @@ function wp_models_reload_vids() {
 				media_type: 'vids',
 				media: jQuery( this ).val()
 			};
-			jQuery(this).html( "Deleting..." );
+			
 			jQuery.post( ajaxurl, wpm_data, function( response ){
 				wp_models_reload_vids();
 			});
