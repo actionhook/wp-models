@@ -37,11 +37,23 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	/**
 	 	 * The storage locations available.
 	 	 *
-	 	 * @package pkgtoken
-	 	 * @var 0.1
+	 	 * An array of WP_Models_Model_Storage_Location objects.
+	 	 *
+	 	 * @package WP Models\Controllers
+	 	 * @var array
 	 	 * @since 1.1
 	 	 */
-	 	protected $storage_locations;
+	 	private $_storage_locations;
+	 	
+	 	/**
+	 	 * The storage location in use by the plugin.
+	 	 * 
+	 	 * @package WP Models\Controllers
+	 	 * @var object
+	 	 * @see \WP Models\WP_Models_Model_Storage_Location 
+	 	 * @since 0.1
+	 	 */
+	 	private $_current_storage_location;
 	 	
 	 	/**
 	 	 * Initialize the plugin
@@ -167,8 +179,20 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		//check for security
 	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
 	 			die( 'NONCE CHECK FAILED' );
-		
-	 		$result = $this->cpts[$_POST['post_type']]->save_media( $_POST, $_FILES, $this->current_storage_location, true );
+			
+			//get the upload callback and storage bucket for the current storage location
+			$callback = $this->storage_locations[$this->settings_model->get_storage_location()]->get_post_callback();
+	 		$bucket = $this->storage_locations[$this->settings_model->get_storage_location()]->get_storage_bucket();
+	 		
+	 		//execute the callback
+			if ( isset( $callback ) ):
+				if ( is_array( $callback )  && method_exists( $callback[0], $callback[1] ) ):
+					$result = call_user_func_array( $callback, array( $_POST, $_FILES, $bucket ) );
+				elseif ( function_exists( $callback ) ):
+					$result = call_user_func( $callback, $_POST, $_FILES, $bucket );
+				endif;
+			endif;
+	 		
 	 		die( $result );
 	 	}
 	 	
@@ -215,7 +239,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			$type = 'vids';
 	 		endif;
 	 		
-	 		$result = $this->cpts[$_POST['post_type']]->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->current_storage_location );
+	 		$result = $this->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->_current_storage_location );
 	 		die( $result );
 	 	}
 	 	
@@ -310,7 +334,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	public function render_media( $post_id, $post_type, $media_type, $view = null )
 	 	{
 			//get the post media
-			$post_media = $this->cpts[$post_type]->get_media( $post_id, $media_type, $this->current_storage_location );
+			$post_media = $this->_get_media( $post_id, $media_type, $this->storage_locations[$this->settings_model->get_storage_location()] );
 			
 			//if we have an array of media items, include the appropriate view
 	 		if (  $post_media ):
@@ -423,13 +447,13 @@ if ( ! class_exists( 'WP_Models' ) ):
 				$post_pics = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
 					'pics',
-					$this->current_storage_location
+					$this->_current_storage_location
 				);
 				
 				$post_vids = $this->cpts[$post->post_type]->get_media( 
 					$post->ID,
 					'vids',
-					$this->current_storage_location
+					$this->_current_storage_location
 				);
 				
 				//add additional view variables
@@ -508,18 +532,40 @@ if ( ! class_exists( 'WP_Models' ) ):
 			endif;
 		}
 		
+		/**
+		 * Initialize the storage locations
+		 *
+		 * @package WP Models\Controllers
+		 *
+		 * @since 1.1
+		 */
 		public function init_storage()
 		{
+			$uploads_dir = wp_upload_dir();
+			
 			require_once( $this->app_models_path . 'model_storage_location.php' );
 			$this->storage_locations = array(
-				'local' => new WP_Models_Model_Storage_Location( null, null, null, array( 'Helper_Functions', 'get_local_directory_contents' ), array( 'Helper_Functions', 'plupload' ), array( 'Helper_Functions', 'delete_local_file' ) )
+				'local' => new WP_Models_Model_Storage_Location( 
+					null,
+					null, 
+					trailingslashit( $uploads_dir['basedir'] ) . 'wp-models',
+					$this->media_upload_uri = trailingslashit( content_url() ) . 'uploads/wp-models',
+					array( &$this, 'get_media_local' ),
+					array( &$this, 'save_media_local' ),
+					array( &$this, 'delete_media_local' )
+				)
 			);
 			
 			/**
 			 * @todo change this to a plugin setting.
 			 */
-			$this->current_storage_location = $this->storage_locations['local'];
-//print_r( $this->current_storage_location);
+			//$storage_location = $this->settings_model->get_storage_location();
+			
+			if ( isset( $storage_location ) ):
+				$this->_current_storage_location = $this->storage_locations[$storage_location];
+			else:
+				$this->_current_storage_location = $this->storage_locations['local'];
+			endif;
 		}
 		
 		/**
@@ -539,26 +585,26 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 * @return array $contents 
 		 * @since 0.1
 		 */
-		private function _get_media( $post_id, $post_type, $type )
+		private function _get_media( $post_id, $type, $location )
 		{
 			//set the target directory to pass to the callback
-			$upload_dir = 
-			$target = sprintf( '%1$s/%2$s/%3$s',
-	 	 		untrailingslashit( $this->cpts[$post_type]->get_media_upload_dir() ),
+			$target = sprintf( '%1$s/%2$s',
 	 			$post_id,
 	 			$type
 	 		);
 	 		
-	 		$get_callback = $this->current_storage_location->get_get_callback();
+	 		$get_callback = $location->get_get_callback();
 			
 			//get the media from the storage location using the registered callback
 	 		if( isset( $get_callback ) ):
 	 			if ( is_array( $get_callback ) ):
-	 				$media = call_user_func_array( $get_callback, array( $target ) );
+	 				$media = call_user_func_array( $get_callback, array( $location->get_storage_bucket(), $post_id, $type ) );
 	 			elseif ( function_exists( $get_callback ) ):
-	 				$media = call_user_func( $get_callback, $target );
+	 				$media = call_user_func( $get_callback, $location->get_storage_bucket(), $post_id, $type );
 	 			endif;
 	 		endif;
+			
+	 		$contents = null;
 	 		
 	 		//step through the contents to only include the filetypes we wish to see in this view
 			if( is_array( $media ) ):
@@ -569,14 +615,17 @@ if ( ! class_exists( 'WP_Models' ) ):
 					$valid_types = array( 'mp4', 'ogv', 'webm' );
 				endif;
 				
+				$storage_uri = untrailingslashit( $location->get_storage_bucket_uri() );
+				
 				foreach( $media as $key => $entry ):
 					if( in_array( $entry['filetype'], $valid_types ) ):
-						$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
-							untrailingslashit( $this->cpts[$post_type]->get_media_upload_uri() ),
-							$post_id,
-							$type,
-							$entry['filename']
-						);
+						if( ! isset( $entry['uri'] ) )
+							$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
+								$storage_uri,
+								$post_id,
+								$type,
+								$entry['filename']
+							);
 						$contents[] = $entry;
 					endif;
 				endforeach;
@@ -584,10 +633,126 @@ if ( ! class_exists( 'WP_Models' ) ):
 			
 			return $contents;
 		}
+				
+		/**
+		 * Get the configured storage locations.
+		 *
+		 * @package WP Models\Controllers
+		 *
+		 * @return array $_storage_locations
+		 * @since 1.0
+		 */
+		public function get_storage_locations()
+		{
+			return $this->_storage_locations;
+		}
 		
+		/**
+		 * Add a storage location.
+		 *
+		 * @package WP Models\Controllers
+		 *
+		 * @param $location An array of key/value pairs with the first element being the location name and
+		 * the second being the storage location object, e.g.:
+		 * <code>
+		 * $this->add_storage_location( 'cloudspace', $storage_object );
+		 * </code>
+		 * 
+		 * @since 1.0
+		 */
+		public function add_storage_location( $location )
+		{
+			if( is_array( $location ) )
+				$this->storage_locations[$location[0]] = $location[1];
+			
+//print_r($this->storage_locations);
+		}
+		
+		/**
+		 * Delete an individual item attached to this post.
+		 *
+		 * @package WP Models\Models
+		 * @param string $post_id The WP post id.
+		 * @param string $media The media item filename.
+		 * @param string $media_type The media type (e.g. pic, vid )
+		 * @param string $location The storage location.
+		 * @since 0.1
+		 */
+		public function delete_media( $post_id, $media, $media_type, $location )
+		{
+			$target = trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
+			
+			$callback = $location->get_delete_callback(); 
+			if ( isset( $callback ) ):
+				if ( is_array( $callback )  && method_exists( $callback[0], $callback[1] ) ):
+					$result = call_user_func_array( $callback, array( $location->get_storage_bucket(), $post_id, $media_type, $media ) );
+				elseif ( function_exists( $callback ) ):
+					$result = call_user_func( $callback, $location->get_storage_bucket(), $post_id, $media_type, $media );
+				endif;
+			endif;
+			
+			return $result;
+		}
+		
+		/**
+		 * Get the current storage location
+		 *
+		 * @package WP Models\Controllers
+		 * @return object $_current_storage_location
+		 * @since 0.1
+		 */
 		public function get_current_storage_location()
 		{
-			return $this->current_storage_location;
+			return $this->_current_storage_location;
+		}
+		
+		public function get_media_local( $storage_bucket, $post_id, $media_type )
+		{
+			$target = sprintf( '%1$s/%2$s/%3$s',
+				untrailingslashit( $storage_bucket ),
+				$post_id,
+				$media_type
+			);
+			return Helper_Functions::get_local_directory_contents( $target );
+		}
+		
+		public function delete_media_local( $storage_bucket, $post_id, $media_type, $media )
+		{
+			$target = sprintf( '%1$s/%2$s/%3$s/%4$s',
+				untrailingslashit( $storage_bucket ),
+				$post_id,
+				$media_type,
+				$media
+			);
+			return Helper_Functions::delete_local_file( $target );
+		}
+		
+		/**
+		 * Save the media attached to this model
+		 *
+		 * @package WP Models\Models
+		 * @param object $post The $_POST object.
+		 * @param object $files The $_FILES object.
+		 * @param bool $log Log the file upload. Default is false.
+		 * @since 0.1
+		 */
+		public function save_media_local( $post, $files, $storage_bucket )
+		{
+			/**
+			 * @todo fix this
+			 */
+			//verify the directory/subdirectories exist and have an index.php
+			Helper_Functions::create_directory( $storage_bucket );
+			Helper_Functions::create_directory(trailingslashit( $storage_bucket ) . $post['post_id'] );
+			Helper_Functions::create_directory(trailingslashit( $storage_bucket ) . trailingslashit( $post['post_id'] ) . $post['type'] );
+			
+			$target = sprintf( '%1$s/%2$s/%3$s',
+	 			untrailingslashit( $storage_bucket ),
+	 			$post['post_id'],
+	 			$post['type']
+	 		);
+print_r($target);
+	 		return Helper_Functions::plupload( $post, $files, $target, true );
 		}
 	}
 endif;

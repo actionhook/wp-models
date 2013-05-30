@@ -62,6 +62,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 					'menu_slug'		=> 'wp-models',
 					'icon_url'		=> null,
 					'callback'		=> null,
+					'position'		=> null
 				),
 				'wp-models-options' => array(
 					//'parent_slug'	=> 'options-general.php',
@@ -216,6 +217,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		{
 			return get_option( 'wp_models_license_status', 'not activated' );
 		}
+		
 		public function get_license_key()
 		{
 			$options = get_option( 'wp_models_general' );
@@ -230,6 +232,11 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		{
 			if( is_array( $page ) )
 				$this->pages = array_merge( $page, $this->pages );
+		}
+		
+		public function get_storage_location()
+		{
+			return 'local';
 		}
 	}
 endif;

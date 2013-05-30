@@ -534,8 +534,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		public function get_media( $post_id, $type, $location )
 		{
 			//set the target directory to pass to the callback
-			$target = sprintf( '%1$s/%2$s/%3$s',
-	 			untrailingslashit( $this->media_upload_dir ),
+			$target = sprintf( '%1$s/%2$s',
 	 			$post_id,
 	 			$type
 	 		);
@@ -545,12 +544,12 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 			//get the media from the storage location using the registered callback
 	 		if( isset( $get_callback ) ):
 	 			if ( is_array( $get_callback ) ):
-	 				$media = call_user_func_array( $get_callback, array( $target ) );
+	 				$media = call_user_func_array( $get_callback, array( $location->get_storage_bucket(), $post_id, $type ) );
 	 			elseif ( function_exists( $get_callback ) ):
-	 				$media = call_user_func( $get_callback, $target );
+	 				$media = call_user_func( $get_callback, $location->get_storage_bucket(), $post_id, $type );
 	 			endif;
 	 		endif;
-	 		
+			
 	 		$contents = null;
 	 		
 	 		//step through the contents to only include the filetypes we wish to see in this view
@@ -562,14 +561,17 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 					$valid_types = array( 'mp4', 'ogv', 'webm' );
 				endif;
 				
+				$storage_uri = untrailingslashit( $location->get_storage_bucket_uri() );
+				
 				foreach( $media as $key => $entry ):
 					if( in_array( $entry['filetype'], $valid_types ) ):
-						$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
-							untrailingslashit( $this->media_upload_uri ),
-							$post_id,
-							$type,
-							$entry['filename']
-						);
+						if( ! isset( $entry['uri'] ) )
+							$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
+								$storage_uri,
+								$post_id,
+								$type,
+								$entry['filename']
+							);
 						$contents[] = $entry;
 					endif;
 				endforeach;
@@ -599,14 +601,6 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 			else:
 				$valid_types = array( 'mp4', 'ogv', 'webm' );
 			endif;
-			
-			/*
-$target = sprintf( '%1$s/%2$s/%3$s',
-	 			untrailingslashit( $this->media_upload_dir ),
-	 			$post_id,
-	 			$type
-	 		);
-*/
 	 		
 			if ( is_dir( $target ) ):
 				if ( $files = scandir( $target ) ):
@@ -672,8 +666,6 @@ $target = sprintf( '%1$s/%2$s/%3$s',
 					call_user_func( $callback, $target );
 				endif;
 			endif;
-			
-	 		//Helper_Functions::plupload( $post, $files, $target, $log );
 		}
 		
 		/**
@@ -688,16 +680,18 @@ $target = sprintf( '%1$s/%2$s/%3$s',
 		 */
 		public function delete_media( $post_id, $media, $media_type, $location )
 		{
-			$target = trailingslashit( $this->media_upload_dir ) . trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
+			$target = trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
 			
 			$callback = $location->get_delete_callback(); 
 			if ( isset( $callback ) ):
 				if ( is_array( $callback )  && method_exists( $callback[0], $callback[1] ) ):
-					call_user_func_array( $callback, array( $target ) );
+					$result = call_user_func_array( $callback, array( $location->get_storage_bucket(), $post_id, $media_type, $media ) );
 				elseif ( function_exists( $callback ) ):
-					call_user_func( $callback, $target );
+					$result = call_user_func( $callback, $location->get_storage_bucket(), $post_id, $media_type, $media );
 				endif;
 			endif;
+			
+			return $result;
 		}
 		
 		/**

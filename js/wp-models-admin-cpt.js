@@ -69,6 +69,7 @@ function wp_models_init_uploader_pics()
 		
 	pics_uploader.bind('UploadComplete', function(up, file, response )
 	{
+		console.log(response);
 		//reload the div containing the elements
 		wp_models_reload_pics();
 	});
@@ -129,6 +130,7 @@ function wp_models_reload_pics() {
 			};
 			jQuery(this).html( "Deleting..." );
 			jQuery.post( ajaxurl, wpm_data, function( response ){
+	console.log(response);
 				wp_models_reload_pics();
 			});
 		});

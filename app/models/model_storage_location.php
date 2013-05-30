@@ -2,7 +2,7 @@
 /**
  * The storage location model.
  *
- * @package pkgtoken
+ * @package WP Models\Models
  * @author authtoken
  * @copyright 2013
  * @version
@@ -13,20 +13,48 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 	/**
 	 * The storage location model
 	 *
-	 * @package pkgtoken
+	 * @package WP Models\Models
 	 * @version 0.1
 	 * @since WP Models 1.1
 	 */
 	class WP_Models_Model_Storage_Location
 	{
+		/**
+		 * The storage location access key.
+		 * 
+		 * @package WP Models\Models
+		 * @var string
+		 * @since 0.1
+		 */
 		private $_access_key;
+		
+		/**
+		 * The storage location secret key.
+		 * 
+		 * @package WP Models\Models
+		 * @var string
+		 * @since 0.1
+		 */
 		private $_secret_key;
+		
+		/**
+		 * The storage location path.
+		 *
+		 * This is the path within the storage location to the files. An an example, the Amazon S3 bucket,
+		 * in which to store files.
+		 * 
+		 * @package WP Models\Models
+		 * @var string
+		 * @since 0.1
+		 */
 		private $_storage_bucket;
+		
+		private $_storage_bucket_uri;
 		
 		/**
 		 * The function to be called to retrieve items from this location.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @var mixed
 		 * @since 0.1
 		 */
@@ -35,7 +63,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * The function to be called to send media to this location.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @var mixed
 		 * @since 0.1
 		 */
@@ -44,7 +72,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * The function to be called to delete media from this location
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @var mixed
 		 * @since 0.1
 		 */
@@ -53,7 +81,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * The class constructor.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @param string $access_key
 		 * @param string $secret_key
 		 * @param string $storage_bucket
@@ -62,11 +90,12 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		 * @param mixed $delete_callback
 		 * @since 0.1
 		 */
-		public function __construct( $access_key, $secret_key, $storage_bucket, $get_callback, $post_callback, $delete_callback )
+		public function __construct( $access_key, $secret_key, $storage_bucket, $storage_bucket_uri, $get_callback, $post_callback, $delete_callback )
 		{
 			$this->_access_key = $access_key;
 			$this->_secret_key = $secret_key;
 			$this->_storage_bucket = $storage_bucket;
+			$this->_storage_bucket_uri = $storage_bucket_uri;
 			$this->_get_callback = $get_callback;
 			$this->_post_callback = $post_callback;
 			$this->_delete_callback = $delete_callback;
@@ -75,7 +104,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * Get the access key.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		public function get_access_key() {
@@ -85,7 +114,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * Get the secret key.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		public function get_secret_key() {
@@ -95,7 +124,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * Get the storage bucket.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		public function get_storage_bucket() {
@@ -103,9 +132,19 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		}
 		
 		/**
+		 * Get the storage bucket uri.
+		 *
+		 * @package WP Models\Models
+		 * @since 0.1
+		 */
+		public function get_storage_bucket_uri() {
+			return $this->_storage_bucket_uri;
+		}
+		
+		/**
 		 * Get the get callback.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		public function get_get_callback() {
@@ -115,7 +154,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * Get the post callback.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		public function get_post_callback() {
@@ -125,7 +164,7 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		/**
 		 * Get the delete callback.
 		 *
-		 * @package pkgtoken
+		 * @package WP Models\Models
 		 * @since 0.1
 		 */
 		public function get_delete_callback() {
