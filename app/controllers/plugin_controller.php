@@ -652,6 +652,19 @@ if ( ! class_exists( 'WP_Models' ) ):
 		}
 		
 		/**
+		 * Get the configured storage locations.
+		 *
+		 * @package WP Models\Controllers
+		 *
+		 * @return array $_storage_locations
+		 * @since 1.0
+		 */
+		public function get_storage_locations()
+		{
+			return $this->_storage_locations;
+		}
+		
+		/**
 		 * Add a storage location.
 		 *
 		 * @package WP Models\Controllers
