@@ -55,7 +55,8 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 			);
 			
 			$this->pages = array(
-				'wp-models'			=> array(
+				/*
+'wp-models'			=> array(
 					'page_title'	=> __( 'WP Models', $txtdomain ),
 					'menu_title'	=> __( 'WP Models', $txtdomain ),
 					'capability'	=> 'manage_options',
@@ -64,26 +65,21 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 					'callback'		=> null,
 					'position'		=> null
 				),
+*/
 				'wp-models-options' => array(
 					//'parent_slug'	=> 'options-general.php',
-					'parent_slug'	=> 'wp-models',
+					//'parent_slug'	=> 'wp-models',
 					'page_title'	=> __( 'General Options', $txtdomain ),
-					'menu_title'	=> __( 'General Options', $txtdomain ),
+					'menu_title'	=> __( 'WP Models', $txtdomain ),
 					'capability'	=> 'manage_options',
 					'menu_slug'		=> 'wp-models-options',
 					'icon_url'		=> null,
 					'callback'		=> null,
 					'view'			=> 'admin_options.php',
-					'js'			=> array( new Base_Model_JS_Object( 'wp-models-admin-settings', $uri . 'js/wp-models-admin-settings.js', array( 'jquery' ), false, false, 'wpModelsL10n' ) ),
 					'css'			=> array( array( 'handle' => 'wp-models-admin-settings', 'src' => $uri . 'css/wp-models-admin-settings.css', 'deps' => null, 'ver' => false, 'media' => 'all' ) ),
 					'help_screen'	=> array(
 							new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-settings-help', null, null, $path . 'help_screen_settings_general.php' )
 					),
-					'admin_notices' => array(
-						get_option( 'wp_models_license_status', 'not activated' ) == 'valid' ?
-							'<div id="wp-models-license-status-message-admin" class="updated"><p>' . __( 'License status: Active', $txtdomain ) . '</p></div>' :
-							'<div id="wp-models-license-status-message-admin" class="error"><p>' . sprintf( __( 'License status: %s', $txtdomain ), get_option( 'wp_models_license_status', __( 'not activated.', $txtdomain ) ) ) . '</p></div>'
-					)
 				)
 			);
 			
@@ -103,23 +99,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 			
 			
 			$this->settings_fields = array(
-				'license_key' => array(
-					'title'				=> __( 'License Key' ),
-					'callback'			=> null,
-					'page'				=> 'wp-models-options',
-					'section'			=> 'wp-models-general',
-					'default'			=> '',
-					'args'				=> array(
-						'type'			=> 'text',
-						'id'			=> 'wp-models-license-key',
-						'name'			=> 'wp_models_general[license_key]',
-						'placeholder'	=> __( 'Enter License Key', $txtdomain ),
-						'value'			=> $this->get_settings( 'wp_models_general', 'license_key' ),
-						'after'			=> get_option( 'wp_models_license_status' ) == 'valid' ? 
-							$path . 'admin_ajax_license_key_active.php' :
-							$path . 'admin_ajax_license_key_inactive.php'
-					)
-				),
+			
 				'use_filter' => array(
 					'title'			=> __( 'Use content filter?', $txtdomain ),
 					'callback'		=> null,
@@ -191,47 +171,6 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 				$options['flowplayer_style'] = 1;
 			
 			update_option( $this->options['wp-models']['option_name'], $options );
-		}
-		
-		/**
-		 * The update_option_wp_models_general action callback.
-		 *
-		 * This performs a license check every time the WP Models options are saved and stores the results.
-		 *
-		 * @package WP Models\Models
-		 * @param $status The license status.
-		 * @since 0.1
-		 */
-		public function update_license_status( $status )
-		{	
-			update_option( 'wp_models_license_status', $status );
-		}
-		
-		/**
-		 * Get the plugin license status.
-		 *
-		 * @package pkgtoken
-		 * @since 
-		 */
-		public function get_license_status()
-		{
-			return get_option( 'wp_models_license_status', 'not activated' );
-		}
-		
-		public function get_license_key()
-		{
-			$options = get_option( 'wp_models_general' );
-			$key = null;
-			if( isset( $options['license_key'] ) )
-				$key = $options['license_key'];
-			
-			return $key;
-		}
-		
-		public function add_settings_page( $page )
-		{
-			if( is_array( $page ) )
-				$this->pages = array_merge( $page, $this->pages );
 		}
 		
 		public function get_storage_location()

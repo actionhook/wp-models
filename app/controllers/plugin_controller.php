@@ -65,9 +65,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	{	
 	 		//require necessary files
 	 		require_once( $this->app_models_path . '/model_cpt_models.php' );
-	 		require_once( $this->app_models_path . '/model_cpt_shoots.php' );
+	 		//require_once( $this->app_models_path . '/model_cpt_shoots.php' );
 	 		require_once( $this->app_models_path . '/model_settings.php' );
-	 		require_once( $this->path . 'lib/edd/edd_updater.php' );
+	 		//require_once( $this->path . 'lib/edd/edd_updater.php' );
 	 		
 	 		//get the plugin settings
 	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
@@ -76,6 +76,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		$this->init_storage();
 	 		
 	 		//initialize the updater
+/*
 	 		$args = array(
 	 			'license' 	=> $this->settings_model->get_license_key(),
 				'item_name'	=> 'WP Models Pro',
@@ -83,6 +84,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 				'version' 	=> $this->version
 			);
 	 		$this->updater = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
+*/
 	 		
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
@@ -90,10 +92,10 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		
 	 		//set up the plugin custom post types
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
-	 		define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
+	 		//define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
 	 		$this->cpts = array(
 	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain ),
-	 			_WP_MODELS_CPT_SHOOTS_SLUG => new WP_Models_CPT_Shoots_Model( $this->uri, $this->txtdomain )
+	 			//_WP_MODELS_CPT_SHOOTS_SLUG => new WP_Models_CPT_Shoots_Model( $this->uri, $this->txtdomain )
 	 		);
 	 		
 	 		$this->add_actions_and_filters();
@@ -638,19 +640,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 			return $contents;
 		}
 				
-		/**
-		 * Get the configured storage locations.
-		 *
-		 * @package WP Models\Controllers
-		 *
-		 * @return array $_storage_locations
-		 * @since 1.0
-		 */
-		public function get_storage_locations()
-		{
-			return $this->_storage_locations;
-		}
-		
 		/**
 		 * Get the configured storage locations.
 		 *
