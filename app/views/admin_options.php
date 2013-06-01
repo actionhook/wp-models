@@ -12,7 +12,8 @@
 <div class="wrap">
 	<h2><?php echo $page['page_title'] ?></h2>
 	<div id="wp-models-info">
-		<p>We can put propaganda here. Perhaps the rss feed from our site.</p>
+		<a href="http://actionhook.com/downloads/wp-models-pro/"><img src="http://actionhook.com/wp-content/uploads/edd/2013/05/WP-Models-Custom.jpg" /></a>
+		<p>Be sure to check out our add-ons!!</p>
 	</div>
 	<div id="wp-models-settings-form">
 		<form action="options.php" method="post">
