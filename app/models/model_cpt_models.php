@@ -184,17 +184,23 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 	 				false
 	 			),
 	 			new Base_Model_JS_Object(
+	 				'wp-models-plupload',
+	 				$uri . 'wp-models-plupload.js',
+	 				array( 'jquery-plupload-queue' ),
+	 				false,
+	 				false,
+	 				'wpModelsPluploadL10n'
+	 			),
+	 			new Base_Model_JS_Object(
 		 			'wp-models-admin-cpt',
 		 			$uri . 'wp-models-admin-cpt.js',
-		 			array( 'jquery-plupload-queue' ),
+		 			array( 'jquery-plupload-queue', 'wp-models-plupload' ),
 		 			false,
 		 			true,
 		 			'wpModelsL10n',
 		 			array(
-	 					'storage'		=> 'local',	//deafult to local. Set later by plugin controller
-	 					'url'			=> admin_url( 'admin-ajax.php' ),
-	 					'post_id'		=> $post->ID,
-	 					'post_type'		=> self::$slug
+	 					'post_id'	=> $post->ID,
+	 					'post_type'	=> self::$slug,
 	 				)
 	 			),
 	 			new Base_Model_JS_Object(

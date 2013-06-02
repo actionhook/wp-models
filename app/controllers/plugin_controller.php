@@ -66,12 +66,15 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		//require necessary files
 	 		require_once( $this->app_models_path . '/model_cpt_models.php' );
 	 		require_once( $this->app_models_path . '/model_settings.php' );
+	 		require_once( $this->path . 'lib/plupload.php' );
 	 		
 	 		//get the plugin settings
 	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
 	 		
 	 		//intialize the storage locations
 	 		$this->init_storage();
+	 		
+	 		$this->_init_admin_scripts();
 	 		
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
@@ -114,6 +117,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 			add_filter( 'upload_mimes', 							array( &$this, 'custom_mimes' ) );
 			
 			//filter the wp-models-admin-cpt js localization args
+			add_filter( 'ah_base_filter_script_localization_args-wp-models-plupload',		array( &$this, 'filter_plupload_js' ) );
 	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-cpt',		array( &$this, 'filter_admin_cpt_js' ) );
 	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-settings',	array( &$this, 'filter_admin_cpt_js' ) );
 	 		
@@ -126,6 +130,56 @@ if ( ! class_exists( 'WP_Models' ) ):
 			
 			register_activation_hook( $this->main_plugin_file, array( &$this, 'activate' ) );
 				
+	 	}
+	 	
+	 	private function _init_admin_scripts()
+	 	{	
+	 		//initialize the scripts globally so they can be used by add-ons
+	 		$this->admin_scripts = array(
+	 			new Base_Model_JS_Object( 
+	 				'jquery-plupload-queue',
+	 				$this->js_uri . 'plupload/jquery.plupload.queue/jquery.plupload.queue.js',
+	 				array( 'plupload-all' ),
+	 				'1.5.7',
+	 				false
+	 			),
+	 			new Base_Model_JS_Object(
+		 			'wp-models-admin-cpt',
+		 			$this->js_uri . 'wp-models-admin-cpt.js',
+		 			array( 'jquery-plupload-queue' ),
+		 			false,
+		 			true,
+		 			'wpModelsL10n',
+		 			array(
+	 					'storage'	=> 'local',	//deafult to local. Set later by plugin controller
+	 					'url'		=> admin_url( 'admin-ajax.php' ),
+	 					'foo'=>'bar',
+	 				)
+	 			),
+	 			new Base_Model_JS_Object(
+	 				'wp-models-plupload',
+	 				$this->js_uri . 'wp-models-plupload.js',
+	 				array( 'jquery-plupload-queue' ),
+	 				false,
+	 				false,
+	 				'wpModelsPluploadL10n'
+	 				
+	 			),
+	 			new Base_Model_JS_Object(
+	 				'flowplayer',
+	 				$this->js_uri . 'flowplayer/flowplayer.js',
+	 				array( 'jquery' ),
+	 				'5.4.17',
+	 				false
+	 			),
+	 			new Base_Model_JS_Object(
+					'colorbox',
+					$this->js_uri . 'colorbox/jquery.colorbox.js',
+					array( 'jquery' ),
+					'1.4.15',
+					false
+				)
+	 		);
 	 	}
 	 	
 	 	/**
@@ -362,6 +416,12 @@ if ( ! class_exists( 'WP_Models' ) ):
 			$args['nonce'] = wp_create_nonce( $this->nonce_name );
 			
 			return $args;
+		}
+		
+		public function filter_plupload_js( $l10n )
+		{
+			$l10n = $this->_plupload_i18n();
+			return $l10n;	
 		}
 		
 		/**
@@ -678,6 +738,39 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		);
 //print_r($target);
 	 		return Helper_Functions::plupload( $post, $files, $target, true );
+		}
+		
+		/**
+		 * Description
+		 *
+		 * @package pkgtoken
+		 * @since 
+		 */
+		private function _plupload_i18n()
+		{
+			return array(
+				'select_files' 			=> __( 'Select Files', $this->txtdomain ),
+				'queue_files' 			=> __( 'Add files to the upload queue and click the start button.', $this->txtdomain ),
+				'filename'				=> __( 'Filename', $this->txtdomain ),
+				'status' 				=> __( 'Status', $this->txtdomain ),
+				'size'					=> __( 'Size', $this->txtdomain ),
+				'add_files'				=> __( 'Add files', $this->txtdomain ),
+				'stop_current_upload'	=> __( 'Stop current upload', $this->txtdomain ),
+				'start_uploading_queue'	=> __( 'Start uploading queue', $this->txtdomain ),
+				'uploaded_x_files'		=> __( 'Uploaded %d/%d files', $this->txtdomain ),
+				'n_a'					=> __( 'N/A', $this->txtdomain ),
+				'drag_files_here'		=> __( 'Drag files here.', $this->txtdomain ),
+				'file_extension_error'	=> __( 'File extension error.', $this->txtdomain ),
+				'file_size_error'		=> __( 'File size error.', $this->txtdomain ),
+				'init_error'			=> __( 'Init error.', $this->txtdomain ),
+				'http_error'			=> __( 'HTTP Error.', $this->txtdomain ),
+				'security_error'		=> __( 'Security error.', $this->txtdomain ),
+				'generic_error.'		=> __( 'Generic error', $this->txtdomain ),
+				'io_error'				=> __( 'IO error.', $this->txtdomain ),
+				'stop_upload'			=> __( 'Stop Upload', $this->txtdomain ),
+				'start_upload'			=> __( 'Start Upload', $this->txtdomain ),
+				'x_files_queued'		=> __( '%d files queued', $this->txtdomain ),
+			);
 		}
 	}
 endif;
