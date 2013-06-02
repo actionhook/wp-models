@@ -1,6 +1,6 @@
 <?php
 /**
- * The main WP-Models plugin file.
+ * The main WP Models plugin file.
  *
  * @package WP Models
  * @author ActionHook <plugins@actionhook.com>
@@ -10,8 +10,8 @@
 
 /*
 Plugin Name: WP Models
-Plugin URI: http://actionhook.com/wp-models
-Description: WP-Models Pro is a plugin designed for modeling agencies, model sites, or individuals that want an elegant solution to showcase themselves. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
+Plugin URI: http://wordpress.org/extend/plugins/wp-models
+Description: WP-Models is a plugin designed for modeling agencies, model sites, or individuals that want an elegant solution to showcase themselves. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
 Version: 1.0
 Author: ActionHook <plugins@actionhook.com>
 License: GPL2

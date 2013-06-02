@@ -43,9 +43,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		 * @since 0.1
 		 */
 		protected function init( $uri, $path, $txtdomain )
-		{
-			global $WP_Models;
-			
+		{	
 			$this->options = array(
 				'wp-models' => array(
 					'option_group' => 'wp_models',
@@ -55,26 +53,14 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 			);
 			
 			$this->pages = array(
-				/*
-'wp-models'			=> array(
-					'page_title'	=> __( 'WP Models', $txtdomain ),
-					'menu_title'	=> __( 'WP Models', $txtdomain ),
-					'capability'	=> 'manage_options',
-					'menu_slug'		=> 'wp-models',
-					'icon_url'		=> null,
-					'callback'		=> null,
-					'position'		=> null
-				),
-*/
 				'wp-models-options' => array(
-					//'parent_slug'	=> 'options-general.php',
-					//'parent_slug'	=> 'wp-models',
 					'page_title'	=> __( 'General Options', $txtdomain ),
 					'menu_title'	=> __( 'WP Models', $txtdomain ),
 					'capability'	=> 'manage_options',
 					'menu_slug'		=> 'wp-models-options',
 					'icon_url'		=> null,
 					'callback'		=> null,
+					'position'		=> '99.3141579',
 					'view'			=> 'admin_options.php',
 					'css'			=> array( array( 'handle' => 'wp-models-admin-settings', 'src' => $uri . 'css/wp-models-admin-settings.css', 'deps' => null, 'ver' => false, 'media' => 'all' ) ),
 					'help_screen'	=> array(
@@ -99,7 +85,6 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 			
 			
 			$this->settings_fields = array(
-			
 				'use_filter' => array(
 					'title'			=> __( 'Use content filter?', $txtdomain ),
 					'callback'		=> null,

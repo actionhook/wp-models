@@ -65,26 +65,13 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	{	
 	 		//require necessary files
 	 		require_once( $this->app_models_path . '/model_cpt_models.php' );
-	 		//require_once( $this->app_models_path . '/model_cpt_shoots.php' );
 	 		require_once( $this->app_models_path . '/model_settings.php' );
-	 		//require_once( $this->path . 'lib/edd/edd_updater.php' );
 	 		
 	 		//get the plugin settings
 	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
 	 		
 	 		//intialize the storage locations
 	 		$this->init_storage();
-	 		
-	 		//initialize the updater
-/*
-	 		$args = array(
-	 			'license' 	=> $this->settings_model->get_license_key(),
-				'item_name'	=> 'WP Models Pro',
-				'author'	=> 'ActionHook.com',
-				'version' 	=> $this->version
-			);
-	 		$this->updater = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
-*/
 	 		
 	 		//setup our nonce name and action
 	 		$this->nonce_name = '_wp_models_nonce';
@@ -95,11 +82,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		//define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
 	 		$this->cpts = array(
 	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain ),
-	 			//_WP_MODELS_CPT_SHOOTS_SLUG => new WP_Models_CPT_Shoots_Model( $this->uri, $this->txtdomain )
 	 		);
 	 		
 	 		$this->add_actions_and_filters();
-//print_r($this);
 	 	}
 	 	
 	 	/**
@@ -120,11 +105,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		add_action( 'wp_ajax_wp_models_deactivate_license_key',	array( &$this, 'ajax_deactivate_license' ) );
 	 		
 	 		//add other callbacks
-	 		add_action( 'update_option_wp_models_general', 			array( &$this, 'update_option_wp_models_general' ),10,2 );
-	 		
-	 		//filter metabox callback args as necessary
-	 		add_filter( 'filter_metabox_callback_args', array( &$this, 'setup_metabox_args' ), 10, 2 );
-	 		
+	 		add_action( 'activated_plugins', 						array( &$this, 'activated_plugins' ) );
 
 	 		//filter css as necessary
 	 		add_filter( 'ah_base_filter_styles-flowplayer', 		array( &$this, 'filter_flowplayer_css' ) );
@@ -145,31 +126,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 			
 			register_activation_hook( $this->main_plugin_file, array( &$this, 'activate' ) );
 				
-	 	}
-	 	
-	 	/**
-	 	 * Add additional metabox callback args as necessary for views.
-	 	 *
-	 	 * @package WP Models\Controllers
-		 * @param object $post The WP post object.
-	 	 * @param array $metabox The WP metabox array.
-	 	 * @return array $metabox The modified WP metabox array.
-	 	 * @todo remove for codex version
-	 	 * @since 0.1
-	 	 */
-	 	public function setup_metabox_args( $post, $metabox )
-	 	{	
-	 		switch( $metabox['id'] )
-	 		{
-	 			case 'wp-models-shoot-models':
-	 				$models = $this->cpts[_WP_MODELS_CPT_MODELS_SLUG]->get_models();
-	 				foreach( $models as $model ):
-	 					$metabox['args']['models'][$model->ID] = $model->post_title;
-	 				endforeach;
-	 				break;
-	 		}
-	 		
-	 		return $metabox;
 	 	}
 	 	
 	 	/**
@@ -440,38 +396,12 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 * @package WP Models\Controllers
 		 * @param string $content The WP post content.
 		 * @since 0.1
-		 * @todo Modfiy this function to allow for end user views in their theme directory
 		 */
 		public function render_single_view( $content )
 		{
 			global $post;
 			
 			if( is_single() && isset ( $this->cpts[$post->post_type] ) ):				
-				/*
-//get the post media
-				$post_pics = $this->_get_media( 
-					$post->ID,
-					'pics',
-					$this->storage_locations[$this->settings_model->get_storage_location()]
-				);
-				
-				$post_vids = $this->_get_media( 
-					$post->ID,
-					'vids',
-					$this->storage_locations[$this->settings_model->get_storage_location()]
-				);
-				
-				//add additional view variables
-				$info = sprintf( '<p>Age: %1$s | Height: %2$s | Weight: %3$s | %4$s-%5$s-%6$s</p>',
-					$post->model_age,
-					$post->model_height,
-					$post->model_weight,
-					$post->model_bust,
-					$post->model_waist,
-					$post->model_hips
-				);
-*/
-				
 				//this allows the user to add a content-$post_type_slug.php in their theme directory and use that.
 				if( file_exists( get_stylesheet_directory() . '/content-' . $post->post_type . '.php' ) ) :
 					$view = get_stylesheet_directory() . '/content-' . $post->post_type . '.php';
@@ -498,8 +428,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 */
 		public function activate()
 		{
-			$status = $this->updater->check_license();
-			$this->settings_model->update_license_status( $status );
 		}
 		
 		/**
@@ -520,22 +448,13 @@ if ( ! class_exists( 'WP_Models' ) ):
 			delete_option( 'wp_models_general' );
 	 	}
 	 	
-	 	/**
-		 * The update_option_wp_models_general action callback.
-		 *
-		 * This performs a license check every time the WP Models options are saved and stores the results.
-		 *
-		 * @package WP Models\Models
-		 * @param array $old_value The values currently stored.
-		 * @param array $new_value The POSTed values.
-		 * @since 0.1
-		 */
-		public function update_option_wp_models_general( $old_value, $new_value )
-		{	
-			if( isset( $new_value['license_key'] ) ):
-	 			$license_status = $this->updater->check_license( $new_value['license_key'], 'WP Models Pro' );
-				$this->settings_model->update_license_status( $license_status );
-			endif;
+	 	
+		
+		public function activated_plugins()
+		{
+			$plugins = get_option('activated_plugins');
+			sort($plugins);
+			update_option('activated_plugins', $plugins);
 		}
 		
 		/**
@@ -757,7 +676,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			$post['post_id'],
 	 			$post['type']
 	 		);
-print_r($target);
+//print_r($target);
 	 		return Helper_Functions::plupload( $post, $files, $target, true );
 		}
 	}
