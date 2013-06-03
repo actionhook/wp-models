@@ -256,7 +256,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			$type = 'vids';
 	 		endif;
 	 		
-	 		$result = $this->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->_current_storage_location );
+	 		$result = $this->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->storage_locations[$this->settings_model->get_storage_location()] );
 	 		die( $result );
 	 	}
 	 	
@@ -687,8 +687,8 @@ if ( ! class_exists( 'WP_Models' ) ):
 		public function delete_media( $post_id, $media, $media_type, $location )
 		{
 			$target = trailingslashit( $post_id ) . trailingslashit( $media_type ) . $media;
-			
-			$callback = $location->get_delete_callback(); 
+			$callback = $location->get_delete_callback();
+
 			if ( isset( $callback ) ):
 				if ( is_array( $callback )  && method_exists( $callback[0], $callback[1] ) ):
 					$result = call_user_func_array( $callback, array( $location->get_storage_bucket(), $post_id, $media_type, $media ) );
@@ -709,7 +709,12 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 */
 		public function get_current_storage_location()
 		{
-			return $this->_current_storage_location;
+			return $this->storage_locations[$this->settings_model->get_storage_location()];
+		}
+		
+		public function get_nonce()
+		{
+			return wp_create_nonce( $this->nonce_name );
 		}
 		
 		public function get_media_local( $storage_bucket, $post_id, $media_type )
