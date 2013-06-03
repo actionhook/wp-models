@@ -121,6 +121,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-cpt',		array( &$this, 'filter_admin_cpt_js' ) );
 	 		add_filter( 'ah_base_filter_script_localization_args-wp-models-admin-settings',	array( &$this, 'filter_admin_cpt_js' ) );
 	 		
+	 		//filter the storage locations field
+	 		add_filter( 'ah_filter_settings_field-storage_location', array( &$this, 'filter_settings_field_storage_location' ) );
+	 		
 			//add content filters if so desired
 			$this->settings_model->get_settings( 'wp_models_general', 'use_filter' );
 			
@@ -424,6 +427,23 @@ if ( ! class_exists( 'WP_Models' ) ):
 			return $l10n;	
 		}
 		
+		
+		public function filter_settings_field_storage_location( $field )
+		{	
+			if ( count($this->storage_locations) > 1 ):
+				//we have multiple possible locations
+				foreach($this->storage_locations as $key => $location):
+					$location_options[$key] = $location->get_display_name();
+				endforeach;
+
+				$field['args']['options'] = $location_options;
+				return $field;
+			else:
+				//remove the field entirely
+				return null;
+			endif;
+		}
+		
 		/**
 		 * Change the Flowplayer CSS based on plugin settings
 		 *
@@ -530,7 +550,8 @@ if ( ! class_exists( 'WP_Models' ) ):
 			
 			require_once( $this->app_models_path . 'model_storage_location.php' );
 			$this->storage_locations = array(
-				'local' => new WP_Models_Model_Storage_Location( 
+				'local' => new WP_Models_Model_Storage_Location(
+					__( 'Local Filesystem', $this->txtdomain ),
 					null,
 					null, 
 					trailingslashit( $uploads_dir['basedir'] ) . 'wp-models',

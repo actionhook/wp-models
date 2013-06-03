@@ -110,10 +110,24 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 						'name'		=> 'wp_models_general[flowplayer_style]',
 						'value' 	=> $this->get_settings( 'wp_models_general', 'flowplayer_style' ),
 						'options'	=> array(
-							'Minimalist'	=> 1,
-							'Functional'	=> 2,
-							'Playful'		=> 3
+							1 => 'Minimalist',
+							2 => 'Functional',
+							3 => 'Playful'
 						)
+					)
+				),
+				'storage_location' 	=> array(
+					'title'			=> __( 'Storage Location', $txtdomain ),
+					'callback'		=> null,
+					'page'			=> 'wp-models-options',
+					'section'		=> 'wp-models-general',
+					'default'		=> 'local',
+					'args' => array(
+						'type'		=> 'select',
+						'id'		=> 'wp-models-storage_location',
+						'name'		=> 'wp_models_general[storage_location]',
+						'value'		=> $this->get_settings( 'wp_models_general', 'storage_location' ),
+						'options'	=> array('local'=>'Local Filesystem')
 					)
 				)
 			);
@@ -160,7 +174,7 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		
 		public function get_storage_location()
 		{
-			return 'local';
+			return $this->get_settings( 'wp_models_general', 'storage_location' );
 		}
 	}
 endif;

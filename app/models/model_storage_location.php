@@ -20,6 +20,15 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 	class WP_Models_Model_Storage_Location
 	{
 		/**
+		 * The storage location display name. Used in settings fields, etc.
+		 *
+		 * @package WP Models\Models
+		 * @var string
+		 * @since 0.1
+		 */
+		private $_display_name;
+		
+		/**
 		 * The storage location access key.
 		 * 
 		 * @package WP Models\Models
@@ -90,15 +99,28 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		 * @param mixed $delete_callback
 		 * @since 0.1
 		 */
-		public function __construct( $access_key, $secret_key, $storage_bucket, $storage_bucket_uri, $get_callback, $post_callback, $delete_callback )
+		public function __construct( $display_name, $access_key, $secret_key, $storage_bucket, $storage_bucket_uri, $get_callback, $post_callback, $delete_callback )
 		{
-			$this->_access_key = $access_key;
-			$this->_secret_key = $secret_key;
-			$this->_storage_bucket = $storage_bucket;
-			$this->_storage_bucket_uri = $storage_bucket_uri;
-			$this->_get_callback = $get_callback;
-			$this->_post_callback = $post_callback;
-			$this->_delete_callback = $delete_callback;
+			$this->_display_name		= $display_name;
+			$this->_access_key			= $access_key;
+			$this->_secret_key			= $secret_key;
+			$this->_storage_bucket		= $storage_bucket;
+			$this->_storage_bucket_uri	= $storage_bucket_uri;
+			$this->_get_callback		= $get_callback;
+			$this->_post_callback		= $post_callback;
+			$this->_delete_callback		= $delete_callback;
+		}
+		
+		/**
+		 * Get the display name
+		 *
+		 * @package WP Models\Models
+		 * @return string $_display_name
+		 * @since 0.1
+		 */
+		public function get_display_name()
+		{
+			return $this->_display_name;
 		}
 		
 		/**
