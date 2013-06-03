@@ -63,7 +63,9 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 					'position'		=> '99.3141579',
 					'view'			=> 'admin_options.php',
 					'css'			=> array( 
-						array( 'handle' => 'wp-models-admin-settings', 'src' => $uri . 'css/wp-models-admin-settings.css', 'deps' => null, 'ver' => false, 'media' => 'all' )
+						array( 'handle' => 'wp-models-admin-settings', 'src' => $uri . 'css/wp-models-admin-settings.css', 'deps' => null, 'ver' => false, 'media' => 'all' ),
+						array( 'handle' => 'twitter-bootstrap', 'src' => '//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css', 'deps' => null, 'ver' => false, 'media' => 'all' ),
+						array( 'handle' => 'font-awesome', 'src' => '//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css', 'deps'=> 'twiter-bootstrap', 'ver' => false, 'media' => 'all' )
 					),
 					'help_screen'	=> array(
 							new Base_Model_Help_Tab( __( 'Overview', $txtdomain ), 'wp-models-settings-help', null, null, $path . 'help_screen_settings_general.php' )
