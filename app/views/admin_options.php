@@ -26,7 +26,7 @@
 			</ul>
 		</div>
 		<div id="wp-models-pro" class="wp-models-version">
-			<p><?php _e( 'Upgrade to the Pro Version for only $1,500,000 USD', $this->txtdomain ); ?></p>
+			<p><a href="http://actionhook.com/downloads/wordpress-models-plugin-pro" target="_blank">Upgrade to the Pro Version for only $1,500,000 USD</a></p>
 			<ul>
 				<li>All the features of our free plugin</li>
 				<li>Add Model Shoots to your site</li>
