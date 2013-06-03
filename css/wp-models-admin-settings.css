@@ -4,4 +4,12 @@
 	border: 1px solid #000000;
 	border-radius: 10px;
 	padding: 15px;
+	width: 50%;
+}
+
+.wp-models-version
+{
+	float: left;
+	width: 45%;
+	border: 1px solid black;
 }
