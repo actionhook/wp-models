@@ -603,7 +603,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 				$storage_uri = untrailingslashit( $location->get_storage_bucket_uri() );
 				
 				foreach( $media as $key => $entry ):
-					if( in_array( $entry['filetype'], $valid_types ) ):
+					if( in_array( strtolower( $entry['filetype'] ), $valid_types ) ):
 						if( ! isset( $entry['uri'] ) )
 							$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
 								$storage_uri,
