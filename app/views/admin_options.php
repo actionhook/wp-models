@@ -8,12 +8,9 @@
  * @since WP Base 0.1
  */
 ?>
-<!--
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
-<link href="//netdna.bootstrapcdn.com/font-awesome/3.1.1/css/font-awesome.css" rel="stylesheet">
--->
-<div class="wrap">
-	<h1><?php echo $page['page_title'] ?></h1>
+
+<div class="wrap wp-models-options">
+	<h2><?php echo $page['page_title'] ?></h2>
 	<div id="wp-models-info" clas="postbox">
 		<h3 class="hndle"><i class="icon-camera-retro icon-2x"></i>  <?php _e( 'WP Models', $this->txtdomain ); ?></h3>
 		<div class="wp-models-logo"><img src="<?php echo trailingslashit( $this->uri ); ?>images/wp-models.jpg" alt="wp-models" width="300" height="141" /></div>

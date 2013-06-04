@@ -10,11 +10,11 @@
 .wp-models-version
 {
 	float: left;
-width: 45%;
-border: 1px solid black;
-border-radius: 8px;
-padding: 5px;
-margin-right: 10px;
+	width: 45%;
+	border: 1px solid black;
+	border-radius: 8px;
+	padding: 5px;
+	margin-right: 10px;
 }
 .hndle{
 	font-size: 18px;
@@ -55,6 +55,6 @@ width:50%;
 	line-height: 30px
 	text-align: left;
 }
-h1 {
-	font-size: 30px !important;
+h3 {
+	font-size: 1.17em !important;
 }
