@@ -33,6 +33,7 @@
 	margin: 2.0%;
 	vertical-align: top;
 	float: left;
+	min-width: 100px;
 }
 
 .single-wp-models-model .flowplayer

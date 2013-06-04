@@ -4,4 +4,57 @@
 	border: 1px solid #000000;
 	border-radius: 10px;
 	padding: 15px;
+	width: 50%;
+}
+
+.wp-models-version
+{
+	float: left;
+	width: 45%;
+	border: 1px solid black;
+	border-radius: 8px;
+	padding: 5px;
+	margin-right: 10px;
+}
+.hndle{
+	font-size: 18px;
+	line-height: 38px;
+	background-color: #eeeeee;
+	padding-left: 20px;
+	padding-top: 5px;
+	border-color: black;
+	border-radius: 8px;
+	vertical-align:middle;
+	border: solid;
+}
+.wp-models-logo{
+margin-left:auto;
+margin-right:auto;
+width:50%;
+}
+
+.free-title{
+	font-size: 18px;
+	line-height: 24px;
+	text-align: center;
+	background: #d3d3d3;
+	padding: 4px;
+	margin: 10px;
+	border-radius: 8px;
+}
+.pro-title{
+	font-size: 18px;
+	line-height: 24px;
+	text-align: center;
+	background: #d3d3d3;
+	padding: 4px;
+	margin: 10px;
+	border-radius: 8px;
+}
+.wp-model-news {
+	line-height: 30px
+	text-align: left;
+}
+h3 {
+	font-size: 1.17em !important;
 }
