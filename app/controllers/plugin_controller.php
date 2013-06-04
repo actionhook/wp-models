@@ -104,8 +104,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		add_action( 'wp_ajax_nopriv_wp_models_get_media', 		array( &$this, 'ajax_get_media' ) );
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_pic', 		array( &$this, 'ajax_delete_media' ) );
 	 		add_action( 'wp_ajax_wp_models_delete_shoot_vid', 		array( &$this, 'ajax_delete_media' ) );
-	 		add_action( 'wp_ajax_wp_models_activate_license_key',	array( &$this, 'ajax_activate_license' ) );
-	 		add_action( 'wp_ajax_wp_models_deactivate_license_key',	array( &$this, 'ajax_deactivate_license' ) );
 	 		
 	 		//add other callbacks
 	 		add_action( 'activated_plugins', 						array( &$this, 'activated_plugins' ) );
@@ -259,83 +257,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		$result = $this->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->storage_locations[$this->settings_model->get_storage_location()] );
 	 		die( $result );
 	 	}
-	 	
-	 	/**
-	 	 * Activate the plugin license
-	 	 *
-	 	 * @package WP Models\Controllers
-	 	 * @since 0.1
-	 	 */
-	 	public function ajax_activate_license()
-	 	{
-	 		//check for security
-	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
-	 			die( 'Security check failed' );
-	 			
-	 		if( ! class_exists( 'EDD_Interface' ) )
-	 			require_once( $this->path . '/lib/edd/edd_interface.php' );
-	 		
-	 		$args = array( 'version' => $this->version );
-	 		//$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
- 			
-	 		$status = $this->updater->activate_license( $_POST['key'], 'WP Models Pro' );
-
- 			$txtdomain = $this->txtdomain;
- 			
- 			if ( $status == 'valid' ):
- 				$message = __( 'License Key activated.', $this->txtdomain );
- 				$file = 'admin_ajax_license_key_active.php';
- 				$this->settings_model->update_license_status( $status );
- 			elseif ( $status == false ):
- 				$message = __('There was an error contacting the license server. Please try again later.', $this->txtdomain );
- 				$file = 'admin_ajax_license_key_inactive.php';
- 			else:
- 				$message = __( 'License key invalid.', $this->txtdomain );
- 				$file = 'admin_ajax_license_key_inactive.php';
- 				$this->settings_model->update_license_status( $status );
-	 		endif;
-	 		
-	 		die( require_once( $this->app_views_path . $file ) );
-	 	}
-	 	
-	 	/**
-	 	 * Activate the plugin license
-	 	 *
-	 	 * @package WP Models\Controllers
-	 	 * @since 0.1
-	 	 */
-	 	public function ajax_deactivate_license()
-	 	{
-	 		//check for security
-	 		if ( ! isset( $_POST['nonce'] ) || ! check_ajax_referer( $this->nonce_name, 'nonce' ) )
-	 			die( 'Security check failed' );
-	 			
-	 		if( ! class_exists( 'EDD_Interface' ) )
-	 			require_once( $this->path . '/lib/edd/edd_interface.php' );
-	 		
-	 		$args = array( 'version' => $this->version );
-	 		//$edd = new EDD_Interface( 'http://actionhook.com', $this->main_plugin_file, $args );
- 			
-	 		$status = $this->updater->deactivate_license( $_POST['key'], 'WP Models Pro' );
-	 		
- 			$txtdomain = $this->txtdomain;
- 			
- 			if ( $status == 'deactivated' ):
- 				$message = __( 'License Key deactivated.', $this->txtdomain );
- 				$file = 'admin_ajax_license_key_inactive.php';
- 				$this->settings_model->update_license_status( $status );
- 			elseif ( $status == false ):
- 				$message = __('There was an error contacting the license server. Please try again later.', $this->txtdomain );
- 				$file = 'admin_ajax_license_key_active.php';
- 			else:
- 				$message = __( 'License key invalid.', $this->txtdomain );
- 				$file = 'admin_ajax_license_key_active.php';
- 				$this->settings_model->update_license_status( $status );
-	 		endif;
-	 		
-	 		die( require_once( $this->app_views_path . $file ) );
-	 	}
-	 	
+	 		 	
 	 	/**
 	 	 * Render the media of a specific type attached to this post.
 	 	 *
