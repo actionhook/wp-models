@@ -56,17 +56,16 @@ function wp_models_init_uploader_pics()
 {
 	var pics_uploader = jQuery(".wp-models-pics-uploader").pluploadQueue();
 	
-	jQuery.extend( pics_uploader.settings.filters,
-		[
-			{ title: 'Image Files',  'extensions': 'gif,jpg,png'}
-		]
-	);
-    //extend the existing multipart_params
-    jQuery.extend(pics_uploader.settings.multipart_params, 
-        {
-			'type': 'pics'
-    	}
-	); 
+	pics_uploader.bind('BeforeUpload', function(up, file)
+	{
+        
+        //extend the existing multipart_params
+        jQuery.extend(up.settings.multipart_params, 
+	        {
+				'type': 'pics'
+	    	}
+    	); 
+	});
 		
 	pics_uploader.bind('UploadComplete', function(up, file, response )
 	{
@@ -79,17 +78,14 @@ function wp_models_init_uploader_vids()
 {
 	var vids_uploader = jQuery(".wp-models-vids-uploader").pluploadQueue();
 	
-	jQuery.extend( vids_uploader.settings.filters,
-		[
-			{ title: 'Movie Files',  'extensions': 'mp4,ogv,webm'}
-		]
-	);
-    //extend the existing multipart_params
-    jQuery.extend(vids_uploader.settings.multipart_params, 
-        {
-			'type': 'vids'
-    	}
-	); 
+	vids_uploader.bind('BeforeUpload', function(up, file) 
+    {
+		jQuery.extend(up.settings.multipart_params,
+			{
+	        	'type': 'vids'
+	        }
+        );
+    });
 
 	vids_uploader.bind('UploadComplete', function(up, file, response)
 	{

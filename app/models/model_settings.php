@@ -172,7 +172,15 @@ if ( ! class_exists( 'WP_Models_Settings_Model' ) ):
 		 */
 		public function activate()
 		{
-			update_option( $this->options['wp-models']['option_name'], array( 'use_filter' => true, 'flowplayer_style' => 1 ) );
+			$options = get_option( $this->options['wp-models']['option_name'] );
+			
+			if( ! isset( $options['use_filter'] ) )
+				$options['use_filter'] = true; 
+			
+			if( ! isset( $options['flowplayer_style'] ) )
+				$options['flowplayer_style'] = 1;
+			
+			update_option( $this->options['wp-models']['option_name'], $options );
 		}
 		
 		/**
