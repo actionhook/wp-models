@@ -33,6 +33,58 @@ function wp_models_model_content( $echo = true )
 }
 
 /**
+ * Display or retrieve the model info line
+ *
+ * @package WP Models\Template Tags
+ * @param bool $echo Echo the string (TRUE) or return it (FALSE).
+ * @return string $info_line The model info.
+ * @since 1.0.1
+ */
+function wp_models_model_info( $echo = true )
+{
+	global $post, $WP_Models;
+	
+	$txtdomain = $WP_Models->get_txtdomain();
+	$info_line = '';
+	
+	if( $post->model_age != '' ):
+		$info_line .= sprintf( '%s: %s', __( 'Age', $txtdomain ), $post->model_age );
+		$model_info['age'] = $post->model_age;
+	endif;
+	
+	if( $post->model_height != '' ):
+		if( $info_line != '' )
+			$info_line .= ' | ';
+		$info_line .= sprintf( '%s: %s', __( 'Height', $txtdomain ), $post->model_height );
+		$model_info['height'] = $post->model_height;
+	endif;
+	
+	if( $post->model_weight != '' ):
+		if( $info_line != '' )
+			$info_line .= ' | ';
+		$info_line .= sprintf( '%s: %s', __( 'Weight', $txtdomain ), $post->model_height );
+		$model_info['weight'] = $post->model_weight;
+	endif;
+	
+	if( $post->model_bust != '' && $post->model_waist != '' && $post->model_hips != '' ):
+		if( $info_line != '' )
+			$info_line .= ' | ';
+		$info_line .= sprintf( '%s-%s-%s', $post->model_bust, $post->model_waist, $post->model_hips );
+		$model_info['bust'] = $post->model_bust;
+		$model_info['waist'] = $post->model_waist;
+		$model_info['hips'] = $post->model_hips;
+	endif;
+	
+	$info_line = apply_filters( 'wpm_filter_model_info', $info_line, $model_info );
+	
+	if( $echo ):
+		echo $info_line;
+	else:
+		return $info_line;
+	endif;
+}
+
+/**
  * Display or retrieve the model's age
  *
  * This function may only be used within The Loop.
@@ -286,38 +338,6 @@ function wp_models_shoot_content( $echo = true )
 		echo do_shortcode( $post->shoot_content );
 	else :
 		return do_shortcode( $post->shoot_content );
-	endif;
-}
-
-/**
- * Echo a comma separated list of models attached to a shoot.
- *
- * This can be filtered using the wp_models_shoot_models filter.
- * Example:
- * <code>
- * </code>
- *
- * @package WP Models\Template Tags
- * @since 0.1
- */
-function wp_models_shoot_models( $echo = true )
-{
-	global $post;
-	
-	if( isset ( $post->shoot_models ) && is_array( $post->shoot_models ) ):
-		$models = '';
-		foreach( $post->shoot_models as $key => $model ):
-			$model_post = get_post( $model );
-			
-			$models .= $key > 0 ? ', ' : '';
-			$models .= $model_post->post_title;
-		endforeach;
-	endif;
-	
-	if( $echo ):
-		echo $models;
-	else:
-		return $models;
 	endif;
 }
 ?>
