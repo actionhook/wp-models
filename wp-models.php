@@ -4,7 +4,7 @@
  *
  * @package WP Models
  * @author ActionHook <plugins@actionhook.com>
- * @version 0.1
+ * @version 1.0.1
  * @copyright 2013 ActionHook.com
  */
 
@@ -12,7 +12,7 @@
 Plugin Name: WP Models
 Plugin URI: http://wordpress.org/extend/plugins/wp-models
 Description: WP-Models is a plugin designed for modeling agencies, model sites, or individuals that want an elegant solution to showcase themselves. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
-Version: 1.0
+Version: 1.0.1
 Author: ActionHook <plugins@actionhook.com>
 License: GPL2
  
@@ -35,38 +35,58 @@ License: GPL2
 //check for server requirements
 if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
     // php version isn't high enough
-    add_action( 'admin_notices', 'wp_models_fail_php_check' );
+    add_action( 'admin_notices', 'wpm_fail_php_check' );
 } else {
-
-
-	//include our base classes
-	require_once( 'base/helper.php' );
-	require_once( 'base/controllers/base_controller_plugin.php' );
-	require_once( 'base/models/base_model.php' );
-	require_once( 'base/models/base_model_help_tab.php' );
-	require_once( 'base/models/base_model_metabox.php' );
-	require_once( 'base/models/base_model_cpt.php' );
-	require_once( 'base/models/base_model_settings.php' );
-	require_once( 'base/models/base_model_js_object.php' );
-	
-	require_once( 'app/controllers/plugin_controller.php' );
-	
-	$WP_Models = new WP_Models( 'wp-models', '1.0', plugin_dir_path( __FILE__ ), __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
-	
-	require_once( 'wp-models-template-tags.php' );
+	$plugin_path = plugin_dir_path( __FILE__ );
+	if( is_dir( $plugin_path . 'base' ) && is_dir( $plugin_path . 'app' ) ):
+		//include our base classes
+		include_once( 'base/helper.php' );
+		include_once( 'base/controllers/base_controller_plugin.php' );
+		include_once( 'base/models/base_model.php' );
+		include_once( 'base/models/base_model_help_tab.php' );
+		include_once( 'base/models/base_model_metabox.php' );
+		include_once( 'base/models/base_model_cpt.php' );
+		include_once( 'base/models/base_model_settings.php' );
+		include_once( 'base/models/base_model_js_object.php' );
+		include_once( 'app/controllers/plugin_controller.php' );
+		include_once( 'wp-models-template-tags.php' );
+		
+		if( class_exists( 'WP_Models' ) ):
+			$WP_Models = new WP_Models( 'wp-models', '1.0.1', $plugin_path, __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
+		else:
+			add_action( 'admin_notices', 'wpm_missing_files' );
+		endif;
+	else:
+		add_action( 'admin_notices', 'wpm_missing_files' );
+	endif;
 }
 
 /**
- * Add admin notices
+ * Add admin notice for failed php check
  *
  * @package WP Models
  * @internal
  * @since WP Models 0.1
  */
-function wp_models_fail_php_check() {
+function wpm_fail_php_check() {
 ?>
 <div class="error">
-	<p><?php _e( 'WP-Models requires PHP5.3 or higher. Please contact your host to upgrade your web server.', 'wp-models' ); ?></p>
+	<p><?php _e( 'WP Models requires PHP5.3 or higher. Please contact your host to upgrade your web server.', 'wp-models' ); ?></p>
+</div>
+<?php
+}
+
+/**
+ * Add admin notice for failed base check
+ *
+ * @package WP Models
+ * @internal
+ * @since WP Models 1.1
+ */
+function wpm_missing_files() {
+?>
+<div class="error">
+	<p><?php _e( 'This installation of WP Models is missing critical files. Please delete and reinstall the plugin.', 'wp-models' ); ?></p>
 </div>
 <?php
 }
