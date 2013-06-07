@@ -82,7 +82,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		
 	 		//set up the plugin custom post types
 	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
-	 		//define( '_WP_MODELS_CPT_SHOOTS_SLUG', WP_Models_CPT_Shoots_Model::get_slug() );
 	 		$this->cpts = array(
 	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain ),
 	 		);
@@ -257,7 +256,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		$result = $this->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->storage_locations[$this->settings_model->get_storage_location()] );
 	 		die( $result );
 	 	}
-	 		 	
+	 	
 	 	/**
 	 	 * Render the media of a specific type attached to this post.
 	 	 *
@@ -407,16 +406,21 @@ if ( ! class_exists( 'WP_Models' ) ):
 				//this allows the user to add a content-$post_type_slug.php in their theme directory and use that.
 				if( file_exists( get_stylesheet_directory() . '/content-' . $post->post_type . '.php' ) ) :
 					$view = get_stylesheet_directory() . '/content-' . $post->post_type . '.php';
-				else :
+				elseif ( file_exists( trailingslashit( $this->app_views_path ) . 'content-' . $post->post_type . '.php' ) ):
 					$view = trailingslashit( $this->app_views_path ) . 'content-' . $post->post_type . '.php';
+				else:
+					$view = null;
 				endif;
 				
-				$txtdomain = $this->txtdomain;
 				
-				//include the view
-				ob_start();
-				require_once( $view );
-				$content = ob_get_clean();
+				if( isset( $view ) ):
+					$txtdomain = $this->txtdomain;
+					
+					//include the view
+					ob_start();
+					include_once( $view );
+					$content = ob_get_clean();
+				endif;
 			endif;
 			
 			return $content;
@@ -446,7 +450,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 			//delete the wp-models uploads directory
 			
 			//delete the plugin options
-			delete_option( 'wp_models_license_status' );
 			delete_option( 'wp_models_general' );
 	 	}
 	 	
@@ -592,8 +595,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 		{
 			if( is_array( $location ) )
 				$this->storage_locations[$location[0]] = $location[1];
-			
-//print_r($this->storage_locations);
 		}
 		
 		/**
@@ -684,7 +685,6 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			$post['post_id'],
 	 			$post['type']
 	 		);
-//print_r($target);
 	 		return Helper_Functions::plupload( $post, $files, $target, true );
 		}
 		
