@@ -9,7 +9,7 @@
  */
 ?>
 		<div class="wp-models-model-info">
-			<p>Age: <?php wp_models_model_age(); ?> | Height: <?php wp_models_model_height(); ?>  | Weight: <?php wp_models_model_weight(); ?>  | <?php wp_models_model_bust(); ?>-<?php wp_models_model_waist(); ?>-<?php wp_models_model_hips(); ?></p>
+			<?php wp_models_model_info() ?>
 		</div>
 		<div class="wp-models-toggle-container">
 			<div class="wp-models-content">
