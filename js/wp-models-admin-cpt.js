@@ -28,7 +28,11 @@ jQuery(document).ready(function()
 
 function wp_models_init_colorbox()
 {
-	jQuery('a.wp-models-model-gallery').colorbox();
+	jQuery('a.wp-models-model-gallery').colorbox({
+		scalePhoto: 'true',
+		maxWidth: '90%',
+		maxHeight: '90%'
+	});
 }
 
 function wp_models_init_video_players()
