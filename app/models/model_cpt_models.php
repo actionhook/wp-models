@@ -521,72 +521,6 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		}
 		
 		/**
-		 * Get all media of a certain type attached to the shoot.
-		 *
-		 * This function will call the appropriate content getter function based upon the $location property. This currently supports local storage as well as Amazon S3.
-		 * It will return an array containing information regarding the files present. Each item in the array will itself be an array with the following elements:
-		 * 		uri- the media item uri
-		 * 		filename- the media item filename
-		 * 		filetype- the file extension (jpg, png, etc)
-		 * 		mimetype- the file mime type (image/jpg, video/webm, etc)
-		 
-		 * @package WP Models\Models
-		 * @param string $post_id The WP post ID.
-		 * @param string $type The media type (pics, vids). This is used to determine storage location directories.
-		 * @param object $location The storage location object in use by the plugin.
-		 * @return array $contents
-		 * @since 0.1
-		 */
-		public function get_media( $post_id, $type, $location )
-		{
-			//set the target directory to pass to the callback
-			$target = sprintf( '%1$s/%2$s',
-	 			$post_id,
-	 			$type
-	 		);
-	 		
-	 		$get_callback = $location->get_get_callback();
-			
-			//get the media from the storage location using the registered callback
-	 		if( isset( $get_callback ) ):
-	 			if ( is_array( $get_callback ) ):
-	 				$media = call_user_func_array( $get_callback, array( $location->get_storage_bucket(), $post_id, $type ) );
-	 			elseif ( function_exists( $get_callback ) ):
-	 				$media = call_user_func( $get_callback, $location->get_storage_bucket(), $post_id, $type );
-	 			endif;
-	 		endif;
-			
-	 		$contents = null;
-	 		
-	 		//step through the contents to only include the filetypes we wish to see in this view
-			if( is_array( $media ) ):
-				//set the valid types
-				if ( 'pics' == $type ):
-					$valid_types = array( 'png', 'jpg', 'gif' );
-				else:
-					$valid_types = array( 'mp4', 'ogv', 'webm' );
-				endif;
-				
-				$storage_uri = untrailingslashit( $location->get_storage_bucket_uri() );
-				
-				foreach( $media as $key => $entry ):
-					if( in_array( $entry['filetype'], $valid_types ) ):
-						if( ! isset( $entry['uri'] ) )
-							$entry['uri'] = sprintf( '%1$s/%2$s/%3$s/%4$s',
-								$storage_uri,
-								$post_id,
-								$type,
-								$entry['filename']
-							);
-						$contents[] = $entry;
-					endif;
-				endforeach;
-			endif;
-			
-			return $contents;
-		}
-		
-		/**
 		 * Save the media attached to this model
 		 *
 		 * @package WP Models\Models
@@ -677,14 +611,14 @@ public function delete_media( $post_id, $media, $media_type, $location )
 				$post->model_waist = $meta['model_waist'];
 				$post->model_hips = $meta['model_hips'];
 				
-				$pics = $this->get_media($post->ID, 'pics', $location);
+				$pics = $WP_Models->get_media($post->ID, 'pics', $location);
 				if( isset( $pics ) ):
 					$post->model_pics = $pics;
 					$post->model_pic_count = count($post->model_pics);
 					$post->model_current_pic = -1;
 				endif;
 				
-				$vids = $this->get_media($post->ID, 'vids', $location);
+				$vids = $WP_Models->get_media($post->ID, 'vids', $location);
 				if( isset( $vids ) ):
 					$post->model_vids = $vids;
 					$post->model_vid_count = count($post->model_vids);

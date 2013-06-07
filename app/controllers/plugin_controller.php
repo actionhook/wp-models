@@ -272,7 +272,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	public function render_media( $post_id, $post_type, $media_type, $view = null )
 	 	{
 			//get the post media
-			$post_media = $this->_get_media( $post_id, $media_type, $this->storage_locations[$this->settings_model->get_storage_location()] );
+			$post_media = $this->get_media( $post_id, $media_type, $this->storage_locations[$this->settings_model->get_storage_location()] );
 			
 			//if we have an array of media items, include the appropriate view
 	 		if (  $post_media ):
@@ -516,7 +516,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 * @return array $contents 
 		 * @since 0.1
 		 */
-		private function _get_media( $post_id, $type, $location )
+		public function get_media( $post_id, $type, $location )
 		{
 			//set the target directory to pass to the callback
 			$target = sprintf( '%1$s/%2$s',
