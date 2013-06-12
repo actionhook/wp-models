@@ -31,24 +31,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 	 * @since WP Models 0.1
 	 */
 	 class WP_Models_CPT_Models_Model extends Base_Model_CPT
-	 {
-	 	/**
-	 	 * The CPT slug.
-	 	 *
-	 	 * @package WP Models\Models
-	 	 * @var string
-	 	 * @since 0.1
-	 	 */
-	 	protected static $slug = 'wp-models-model';
-	 	
-	 	/**
-	 	 * The key used to store meta info.
-	 	 *
-	 	 * @package WP Models\Models
-	 	 * @var string
-	 	 * @since 0.1
-	 	 */
-	 	protected static $metakey = '_wp-models-model';
+	 {	
 	 	/**
 		 * The media upload directory path
 		 *
@@ -77,10 +60,12 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 	 	 */
 	 	public function __construct( $uri, $txtdomain )
 	 	{
+	 		$this->slug = 'wp-models-model';
+	 		$this->metakey = ' _wp-models-model';
 	 		//specify our upload directories for media attached to this post type
 	 		$uploads_dir = wp_upload_dir();
-	 		$this->media_upload_dir = trailingslashit( $uploads_dir['basedir'] ) . self::$slug;
-	 		$this->media_upload_uri = trailingslashit( content_url() ) . 'uploads/' . self::$slug;
+	 		$this->media_upload_dir = trailingslashit( $uploads_dir['basedir'] ) . $this->slug;
+	 		$this->media_upload_uri = trailingslashit( content_url() ) . 'uploads/' . $this->slug;
 	 	}
 	 	
 	 	/**
@@ -200,7 +185,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 		 			'wpModelsL10n',
 		 			array(
 	 					'post_id'	=> $post->ID,
-	 					'post_type'	=> self::$slug,
+	 					'post_type'	=> $this->slug,
 	 				)
 	 			),
 	 			new Base_Model_JS_Object(
@@ -350,15 +335,15 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 			if ( $txtdomain = '' and isset( $this->txtdomain ) )
 				$txtdomain = $this->txtdomain;
 				
-			$meta = get_post_meta( $post_id, self::$metakey, true );
+			$meta = get_post_meta( $post_id, $this->metakey, true );
 			$meta = Helper_Functions::sanitize_text_field_array( $meta );
 			
 			$this->metaboxes = array(
 				new Base_Model_Metabox(
-					self::$slug . '-model-details',
+					$this->slug . '-model-details',
 					__( 'Model Details', $txtdomain ),
 					null,
-					self::$slug,
+					$this->slug,
 					'side',
 					'default',
 					array (
@@ -372,10 +357,10 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 					)
 				),
 				new Base_Model_Metabox(
-					self::$slug . '-model-pics',
+					$this->slug . '-model-pics',
 					__( 'Model Pictures', $txtdomain ),
 					null,
-					self::$slug,
+					$this->slug,
 					'normal',
 					'high',
 					array (
@@ -383,10 +368,10 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 					) 
 				),
 				new Base_Model_Metabox(
-					self::$slug . '-model-pics-uploader',
+					$this->slug . '-model-pics-uploader',
 					__( 'Model Pictures Uploader', $txtdomain ),
 					null,
-					self::$slug,
+					$this->slug,
 					'normal',
 					'high',
 					array (
@@ -394,10 +379,10 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 					) 
 				),
 				new Base_Model_Metabox(
-					self::$slug . '-model-vids',
+					$this->slug . '-model-vids',
 					__( 'Model Videos', $txtdomain ),
 					null,
-					self::$slug,
+					$this->slug,
 					'normal',
 					'high',
 					array (
@@ -405,10 +390,10 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 					) 
 				),
 				new Base_Model_Metabox(
-					self::$slug . '-model-vids-uploader',
+					$this->slug . '-model-vids-uploader',
 					__( 'Model Videos Uploader', $txtdomain ),
 					null,
-					self::$slug,
+					$this->slug,
 					'normal',
 					'high',
 					array (
@@ -502,7 +487,7 @@ if ( ! class_exists( 'WP_Models_CPT_Models_Model' ) ):
 			if( isset( $post_data['wp-models-model-hips' ] ) )
 				$meta['model_hips'] = sanitize_text_field( $post_data['wp-models-model-hips'] );
 			
-			update_post_meta( $post_data['post_ID'], self::$metakey, $meta );
+			update_post_meta( $post_data['post_ID'], $this->metakey, $meta );
 		}
 		
 		/**
@@ -599,9 +584,9 @@ public function delete_media( $post_id, $media, $media_type, $location )
 			
 			$location = $WP_Models->get_current_storage_location();
 			
-			if( $post->post_type == self::$slug ):
+			if( $post->post_type == $this->slug ):
 				
-				$meta = get_post_meta( $post->ID, self::$metakey, true );
+				$meta = get_post_meta( $post->ID, $this->metakey, true );
 				
 				$post->model_content = $post->post_content;
 				$post->model_age = $meta['model_age'];
@@ -639,7 +624,7 @@ public function delete_media( $post_id, $media, $media_type, $location )
 		public function get_models()
 		{
 			$args = array(
-				'post_type' 	=> self::$slug,
+				'post_type' 	=> $this->slug,
 				'orderby' 		=> 'title',
 				'order' 		=> 'ASC'
 			);
@@ -660,7 +645,7 @@ public function delete_media( $post_id, $media, $media_type, $location )
 		/*
 public static function get_model_info( $post_id )
 		{
-			return get_post_meta( $post_id, self::$metakey, true );
+			return get_post_meta( $post_id, $this->metakey, true );
 		}
 */
 		
@@ -672,7 +657,7 @@ public static function get_model_info( $post_id )
 		 */
 		public static function get_model_age( $model_id )
 		{
-			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_age'] );
 		}
 		
@@ -685,7 +670,7 @@ public static function get_model_info( $post_id )
 		 */
 		public static function get_model_height( $model_id )
 		{
-			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_height'] );
 		}
 		
@@ -698,7 +683,7 @@ public static function get_model_info( $post_id )
 		 */
 		public static function get_model_weight( $model_id )
 		{
-			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_weight'] );
 		}
 		
@@ -711,7 +696,7 @@ public static function get_model_info( $post_id )
 		 */
 		public static function get_model_bust( $model_id )
 		{
-			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_bust'] );
 		}
 		
@@ -724,7 +709,7 @@ public static function get_model_info( $post_id )
 		 */
 		public static function get_model_waist( $model_id )
 		{
-			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_waist'] );
 		}
 		
@@ -737,7 +722,7 @@ public static function get_model_info( $post_id )
 		 */
 		public static function get_model_hips( $model_id )
 		{
-			$meta =  get_post_meta( $model_id, self::$metakey, true );
+			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_hips'] );;
 		}
 		
