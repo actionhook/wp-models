@@ -32,49 +32,30 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//check for server requirements
-if ( version_compare( phpversion(), '5.3.0', '<' ) ) {
-    // php version isn't high enough
-    add_action( 'admin_notices', 'wpm_fail_php_check' );
-} else {
-	$plugin_path = plugin_dir_path( __FILE__ );
-	if( is_dir( $plugin_path . 'base' ) && is_dir( $plugin_path . 'app' ) ):
-		//include our base classes
-		include_once( 'base/helper.php' );
-		include_once( 'base/controllers/base_controller_plugin.php' );
-		include_once( 'base/models/base_model.php' );
-		include_once( 'base/models/base_model_help_tab.php' );
-		include_once( 'base/models/base_model_metabox.php' );
-		include_once( 'base/models/base_model_cpt.php' );
-		include_once( 'base/models/base_model_settings.php' );
-		include_once( 'base/models/base_model_js_object.php' );
-		include_once( 'app/controllers/plugin_controller.php' );
-		include_once( 'wp-models-template-tags.php' );
-		
-		if( class_exists( 'WP_Models' ) ):
-			$WP_Models = new WP_Models( 'wp-models', '1.0.1', $plugin_path, __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
-		else:
-			add_action( 'admin_notices', 'wpm_missing_files' );
-		endif;
+
+$plugin_path = plugin_dir_path( __FILE__ );
+if( is_dir( $plugin_path . 'base' ) && is_dir( $plugin_path . 'app' ) ):
+	//include our base classes
+	include_once( 'base/helper.php' );
+	include_once( 'base/controllers/base_controller_plugin.php' );
+	include_once( 'base/models/base_model.php' );
+	include_once( 'base/models/base_model_help_tab.php' );
+	include_once( 'base/models/base_model_metabox.php' );
+	include_once( 'base/models/base_model_cpt.php' );
+	include_once( 'base/models/base_model_settings.php' );
+	include_once( 'base/models/base_model_js_object.php' );
+	include_once( 'app/controllers/plugin_controller.php' );
+	include_once( 'wp-models-template-tags.php' );
+	
+	if( class_exists( 'WP_Models' ) ):
+		$WP_Models = new WP_Models( 'wp-models', '1.0.1', $plugin_path, __FILE__, plugin_dir_url( __FILE__ ), 'wp-models' );
 	else:
 		add_action( 'admin_notices', 'wpm_missing_files' );
 	endif;
-}
+else:
+	add_action( 'admin_notices', 'wpm_missing_files' );
+endif;
 
-/**
- * Add admin notice for failed php check
- *
- * @package WP Models
- * @internal
- * @since WP Models 0.1
- */
-function wpm_fail_php_check() {
-?>
-<div class="error">
-	<p><?php _e( 'WP Models requires PHP5.3 or higher. Please contact your host to upgrade your web server.', 'wp-models' ); ?></p>
-</div>
-<?php
-}
 
 /**
  * Add admin notice for failed base check
