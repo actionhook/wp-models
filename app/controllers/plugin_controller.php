@@ -66,7 +66,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		//require necessary files
 	 		require_once( $this->app_models_path . '/model_cpt_models.php' );
 	 		require_once( $this->app_models_path . '/model_settings.php' );
-	 		require_once( $this->path . 'lib/plupload.php' );
+	 		require_once( $this->app_path . 'helpers/plupload.php' );
 	 		
 	 		//get the plugin settings
 	 		$this->settings_model = new WP_Models_Settings_Model( $this->uri, $this->app_views_path, $this->txtdomain );
