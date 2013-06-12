@@ -58,6 +58,14 @@ if( ! class_exists( 'WP_Models_Model_Storage_Location' ) ):
 		 */
 		private $_storage_bucket;
 		
+		
+		/**
+		 * The storage location URI.
+		 *
+		 * @package WP Models\Models
+		 * @var string
+		 * @since 0.1
+		 */
 		private $_storage_bucket_uri;
 		
 		/**
