@@ -11,7 +11,7 @@
 /*
 Plugin Name: WP Models
 Plugin URI: http://wordpress.org/extend/plugins/wp-models
-Description: WP-Models is a plugin designed for modeling agencies, model sites, or individuals that want an elegant solution to showcase themselves. <em>PLEASE NOTE:</em> This plugin requires PHP > 5.3.0 or greater.
+Description: WP-Models is a plugin designed for modeling agencies, model sites, or individuals that want an elegant solution to showcase themselves.
 Version: 1.0.1
 Author: ActionHook <plugins@actionhook.com>
 License: GPL2
