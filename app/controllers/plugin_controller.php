@@ -81,9 +81,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 		$this->nonce_action = '5tyhjDR%6%$%^&*IuhbnmknbGTRFGHJN';
 	 		
 	 		//set up the plugin custom post types
-	 		define( '_WP_MODELS_CPT_MODELS_SLUG', WP_Models_CPT_Models_Model::get_slug() );
+	 		$models = new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain );
 	 		$this->cpts = array(
-	 			_WP_MODELS_CPT_MODELS_SLUG => new WP_Models_CPT_Models_Model( $this->uri, $this->txtdomain ),
+	 			$models->get_slug() => $models
 	 		);
 	 		
 	 		$this->add_actions_and_filters();
