@@ -240,6 +240,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	 *
 	 	 * @package WP Models\Controllers
 		 * @since 0.1
+		 * @todo change ajax action names
 	 	 */
 	 	public function ajax_delete_media()
 	 	{
