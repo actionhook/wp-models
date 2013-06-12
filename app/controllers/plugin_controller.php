@@ -580,6 +580,17 @@ if ( ! class_exists( 'WP_Models' ) ):
 		}
 		
 		/**
+		 * Get the current storage location.
+		 *
+		 * @package WP Models\Controllers
+		 * @since 0.1
+		 */
+		public function get_storage_location()
+		{
+			return $this->current_storage_location;
+		}
+		
+		/**
 		 * Add a storage location.
 		 *
 		 * @package WP Models\Controllers
