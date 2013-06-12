@@ -44,7 +44,7 @@ function wp_models_model_info( $echo = true )
 {
 	global $post, $WP_Models;
 	
-	$txtdomain = $WP_Models->get_txtdomain();
+	$txtdomain = $WP_Models->get_textdomain();
 	$info_line = '';
 	
 	if( $post->model_age != '' ):
