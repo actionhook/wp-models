@@ -276,7 +276,13 @@ if ( ! class_exists( 'WP_Models' ) ):
 			$post_media = $this->get_media( $post_id, $media_type, $this->storage_locations[$this->settings_model->get_storage_location()] );
 			
 			//if we have an array of media items, include the appropriate view
-	 		if (  $post_media ):
+			if( is_wp_error( $post_media ) ):
+				return sprintf( 
+					'%s The error was as follows: %s',
+					$post_media->get_error_message(),
+					$post_media->get_error_data()
+				);
+	 		elseif ( $post_media ):
 	 			if ( is_null( $view ) )
 	 				$view = trailingslashit( $this->app_views_path ) . 'ajax_'. $media_type . '_html.php';
 	 			
@@ -536,11 +542,10 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			endif;
 	 		endif;
 			
-	 		$contents = null;
-	 		
-	 		//step through the contents to only include the filetypes we wish to see in this view
-			if( is_array( $media ) ):
-				//set the valid types
+	 		if( is_wp_error( $media ) ):
+	 			return $media;
+	 		elseif ( is_array( $media ) ):
+	 			//set the valid types
 				if ( 'pics' == $type ):
 					$valid_types = array( 'png', 'jpg', 'gif' );
 				else:
@@ -549,6 +554,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 				
 				$storage_uri = untrailingslashit( $location->get_storage_bucket_uri() );
 				
+				//step through the contents to only include the filetypes we wish to see in this view	
 				foreach( $media as $key => $entry ):
 					if( in_array( strtolower( $entry['filetype'] ), $valid_types ) ):
 						if( ! isset( $entry['uri'] ) )
@@ -561,6 +567,8 @@ if ( ! class_exists( 'WP_Models' ) ):
 						$contents[] = $entry;
 					endif;
 				endforeach;
+			else:
+				$contents = null;
 			endif;
 			
 			return $contents;

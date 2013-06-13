@@ -588,26 +588,28 @@ public function delete_media( $post_id, $media, $media_type, $location )
 				
 				$meta = get_post_meta( $post->ID, $this->metakey, true );
 				
-				$post->model_content = $post->post_content;
-				$post->model_age = $meta['model_age'];
-				$post->model_height = $meta['model_height'];
-				$post->model_weight = $meta['model_weight'];
-				$post->model_bust = $meta['model_bust'];
-				$post->model_waist = $meta['model_waist'];
-				$post->model_hips = $meta['model_hips'];
-				
-				$pics = $WP_Models->get_media($post->ID, 'pics', $location);
-				if( isset( $pics ) ):
-					$post->model_pics = $pics;
-					$post->model_pic_count = count($post->model_pics);
-					$post->model_current_pic = -1;
-				endif;
-				
-				$vids = $WP_Models->get_media($post->ID, 'vids', $location);
-				if( isset( $vids ) ):
-					$post->model_vids = $vids;
-					$post->model_vid_count = count($post->model_vids);
-					$post->model_current_vid = -1;
+				if( is_array( $meta ) ):
+					$post->model_content = $post->post_content;
+					$post->model_age = $meta['model_age'];
+					$post->model_height = $meta['model_height'];
+					$post->model_weight = $meta['model_weight'];
+					$post->model_bust = $meta['model_bust'];
+					$post->model_waist = $meta['model_waist'];
+					$post->model_hips = $meta['model_hips'];
+					
+					$pics = $WP_Models->get_media($post->ID, 'pics', $location);
+					if( isset( $pics ) ):
+						$post->model_pics = $pics;
+						$post->model_pic_count = count($post->model_pics);
+						$post->model_current_pic = -1;
+					endif;
+					
+					$vids = $WP_Models->get_media($post->ID, 'vids', $location);
+					if( isset( $vids ) ):
+						$post->model_vids = $vids;
+						$post->model_vid_count = count($post->model_vids);
+						$post->model_current_vid = -1;
+					endif;
 				endif;
 			endif;
 			
