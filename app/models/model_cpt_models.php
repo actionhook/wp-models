@@ -657,7 +657,7 @@ public static function get_model_info( $post_id )
 		 * @param string $model_id The WP post ID for this model.
 		 * @since 0.1
 		 */
-		public static function get_model_age( $model_id )
+		public function get_model_age( $model_id )
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_age'] );
@@ -670,7 +670,7 @@ public static function get_model_info( $post_id )
 		 * @param string $model_id The WP post ID for this model.
 		 * @since 0.1
 		 */
-		public static function get_model_height( $model_id )
+		public function get_model_height( $model_id )
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_height'] );
@@ -683,7 +683,7 @@ public static function get_model_info( $post_id )
 		 * @param string $model_id The WP post ID for this model.
 		 * @since 0.1
 		 */
-		public static function get_model_weight( $model_id )
+		public function get_model_weight( $model_id )
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_weight'] );
@@ -696,7 +696,7 @@ public static function get_model_info( $post_id )
 		 * @param string $model_id The WP post ID for this model.
 		 * @since 0.1
 		 */
-		public static function get_model_bust( $model_id )
+		public function get_model_bust( $model_id )
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_bust'] );
@@ -709,7 +709,7 @@ public static function get_model_info( $post_id )
 		 * @param string $model_id The WP post ID for this model.
 		 * @since 0.1
 		 */
-		public static function get_model_waist( $model_id )
+		public function get_model_waist( $model_id )
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_waist'] );
@@ -722,7 +722,7 @@ public static function get_model_info( $post_id )
 		 * @param string $model_id The WP post ID for this model.
 		 * @since 0.1
 		 */
-		public static function get_model_hips( $model_id )
+		public function get_model_hips( $model_id )
 		{
 			$meta =  get_post_meta( $model_id, $this->metakey, true );
 			return sanitize_text_field( $meta['model_hips'] );;
