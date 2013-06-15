@@ -21,7 +21,7 @@ class TestCptModels extends WP_UnitTestCase
 		$this->_cpt = new WP_Models_CPT_Models_Model( plugin_dir_url( __FILE__ ), 'mytxtdomain' );
 		
 		//create a new post and get the id
-		$post_id = $this->factory->post->create( array( 'post_title' => 'Test Model', 'post_type' => 'wp-models-model', 'post_status' => 'draft' ) );
+		$post_id = $this->factory->post->create( array( 'post_title' => 'Test Model', 'post_type' => 'wp-models-model', 'post_status' => 'publish' ) );
 		
 		$meta = array(
 			'model_age' => 24,
