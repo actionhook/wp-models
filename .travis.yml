@@ -1,6 +1,7 @@
 language: php
 
 php:
+	- 5.2
     - 5.3
     - 5.4
     - 5.5
@@ -30,11 +31,10 @@ before_script:
 
 script:
     - phpunit
-    - php tests/includes/clover.php tests/clover.xml 90
 
 notifications:
     email:
         recipients:
-          - plugins@actionhook.com
+          - daryl@actionhook.com
         on_success: change
         on_failure: always
