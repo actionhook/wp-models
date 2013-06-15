@@ -62,7 +62,7 @@ function wp_models_model_info( $echo = true )
 	if( $post->model_weight != '' ):
 		if( $info_line != '' )
 			$info_line .= ' | ';
-		$info_line .= sprintf( '%s: %s', __( 'Weight', $txtdomain ), $post->model_height );
+		$info_line .= sprintf( '%s: %s', __( 'Weight', $txtdomain ), $post->model_weight );
 		$model_info['weight'] = $post->model_weight;
 	endif;
 	
@@ -312,32 +312,10 @@ function wp_models_media_permalink()
 function wp_models_media_mimetype( $echo = true )
 {
 	global	$post;
-	
 	if( $echo ):
 		echo $post->model_current_media['mimetype'];
 	else:
 		return $post->model_current_media['mimetype'];
-	endif;
-}
-
-/**
- * Display or retrieve the unfiltered shoot content.
- *
- * This function may only be used within The Loop.
- *
- * @package WP Models\Template Tags
- * @param bool $echo Echo the string (TRUE) or return it (FALSE).
- * @return string $content The unfiltered post content.
- * @since WP Models 0.1
- */
-function wp_models_shoot_content( $echo = true )
-{
-	global $post;
-	
-	if( $echo ) :
-		echo do_shortcode( $post->shoot_content );
-	else :
-		return do_shortcode( $post->shoot_content );
 	endif;
 }
 ?>
