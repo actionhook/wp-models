@@ -195,8 +195,8 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			die( 'NONCE CHECK FAILED' );
 			
 			//get the upload callback and storage bucket for the current storage location
-			$callback = $this->storage_locations[$this->settings_model->get_storage_location()]->get_post_callback();
-	 		$bucket = $this->storage_locations[$this->settings_model->get_storage_location()]->get_storage_bucket();
+			$callback = $this->_storage_locations[$this->settings_model->get_storage_location()]->get_post_callback();
+	 		$bucket = $this->_storage_locations[$this->settings_model->get_storage_location()]->get_storage_bucket();
 	 		
 	 		//execute the callback
 			if ( isset( $callback ) ):
@@ -254,7 +254,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 			$type = 'vids';
 	 		endif;
 	 		
-	 		$result = $this->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->storage_locations[$this->settings_model->get_storage_location()] );
+	 		$result = $this->delete_media( $_POST['post_id'], $_POST['media'], $type, $this->_storage_locations[$this->settings_model->get_storage_location()] );
 	 		die( $result );
 	 	}
 	 	
@@ -273,7 +273,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	public function render_media( $post_id, $post_type, $media_type, $view = null )
 	 	{
 			//get the post media
-			$post_media = $this->get_media( $post_id, $media_type, $this->storage_locations[$this->settings_model->get_storage_location()] );
+			$post_media = $this->get_media( $post_id, $media_type, $this->_storage_locations[$this->settings_model->get_storage_location()] );
 			
 			//if we have an array of media items, include the appropriate view
 			if( is_wp_error( $post_media ) ):
@@ -358,9 +358,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 		
 		public function filter_settings_field_storage_location( $field )
 		{	
-			if ( count($this->storage_locations) > 1 ):
+			if ( count($this->_storage_locations) > 1 ):
 				//we have multiple possible locations
-				foreach($this->storage_locations as $key => $location):
+				foreach($this->_storage_locations as $key => $location):
 					$location_options[$key] = $location->get_display_name();
 				endforeach;
 
@@ -481,7 +481,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 			$uploads_dir = wp_upload_dir();
 			
 			require_once( $this->app_models_path . 'model_storage_location.php' );
-			$this->storage_locations = array(
+			$this->_storage_locations = array(
 				'local' => new WP_Models_Model_Storage_Location(
 					__( 'Local Filesystem', $this->txtdomain ),
 					null,
@@ -500,9 +500,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 			//$storage_location = $this->settings_model->get_storage_location();
 			
 			if ( isset( $storage_location ) ):
-				$this->_current_storage_location = $this->storage_locations[$storage_location];
+				$this->_current_storage_location = $this->_storage_locations[$storage_location];
 			else:
-				$this->_current_storage_location = $this->storage_locations['local'];
+				$this->_current_storage_location = $this->_storage_locations['local'];
 			endif;
 		}
 		
@@ -614,7 +614,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		public function add_storage_location( $location )
 		{
 			if( is_array( $location ) )
-				$this->storage_locations[$location[0]] = $location[1];
+				$this->_storage_locations[$location[0]] = $location[1];
 		}
 		
 		/**
@@ -652,7 +652,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 */
 		public function get_current_storage_location()
 		{
-			return $this->storage_locations[$this->settings_model->get_storage_location()];
+			return $this->_storage_locations[$this->settings_model->get_storage_location()];
 		}
 		
 		public function get_nonce()
