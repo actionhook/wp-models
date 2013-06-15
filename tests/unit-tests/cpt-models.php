@@ -11,6 +11,12 @@ class TestCptModels extends WP_UnitTestCase
 		
 		$this->factory = new WPM_UnitTest_Factory();
 		
+		$WP_Models = $this->getMockBuilder('WP_Models')
+						->setConstructorArgs( array( 'wp-models', '1.0.2', $plugin_path, __FILE__, plugin_dir_url( __FILE__ ), 'wp-models') )
+						->getMock();
+		
+		$GLOBALS['WP_Models'] = $WP_Models;
+						
 		//instantiate the cpt
 		$this->_cpt = new WP_Models_CPT_Models_Model( plugin_dir_url( __FILE__ ), 'mytxtdomain' );
 		
@@ -30,7 +36,7 @@ class TestCptModels extends WP_UnitTestCase
 		
 		$this->_post = get_post( $post_id );
 		
-		//call this action to intialize the post object fully 
+		//call this action to intialize the post object fully
 		do_action( 'the_post', $this->_post );
 	}
 	
