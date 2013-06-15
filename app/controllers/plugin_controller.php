@@ -273,7 +273,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 	 	public function render_media( $post_id, $post_type, $media_type, $view = null )
 	 	{
 			//get the post media
-			$post_media = $this->get_media( $post_id, $media_type, $this->_storage_locations[$this->settings_model->get_storage_location()] );
+			$post_media = $this->get_media( $post_id, $media_type, $this->get_current_storage_location() );
 			
 			//if we have an array of media items, include the appropriate view
 			if( is_wp_error( $post_media ) ):
@@ -494,12 +494,9 @@ if ( ! class_exists( 'WP_Models' ) ):
 				)
 			);
 			
-			/**
-			 * @todo change this to a plugin setting.
-			 */
-			//$storage_location = $this->settings_model->get_storage_location();
+			$storage_location = $this->settings_model->get_storage_location();
 			
-			if ( isset( $storage_location ) ):
+			if ( isset( $storage_location ) && isset( $this->_storage_locations[$storage_location] ) ):
 				$this->_current_storage_location = $this->_storage_locations[$storage_location];
 			else:
 				$this->_current_storage_location = $this->_storage_locations['local'];
@@ -652,7 +649,12 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 */
 		public function get_current_storage_location()
 		{
-			return $this->_storage_locations[$this->settings_model->get_storage_location()];
+			$storage_location = $this->settings_model->get_storage_location();
+			if ( isset( $this->_storage_locations[$storage_location] ) ):
+				return $this->_storage_locations[$storage_location];
+			else:
+				return $this->_storage_locations['local'];
+			endif;
 		}
 		
 		public function get_nonce()
