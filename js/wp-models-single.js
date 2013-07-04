@@ -29,7 +29,7 @@ function wp_models_init_player()
 {
 	jQuery('.wp-models-vid').flowplayer(
 		{
-			swf: "flowplayer.swf"
+			swf: wpModelsL10n.flowplayerSwfUrl
 		}
 	);
 }
