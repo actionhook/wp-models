@@ -28,7 +28,7 @@
 	<?php endif; ?>
 	
 	<?php if( wp_models_have_vids() ):?>
-		<div class="wp-models-model-vids">
+		<div class="wp-models-model-vids" data-engine="flash">
 			<h3><?php the_title(); ?> Videos</h3>
 			<?php while ( wp_models_have_vids() ): wp_models_the_vid(); ?>
 			<div class="wp-models-vid is-splash color-light">
