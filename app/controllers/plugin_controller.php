@@ -153,7 +153,7 @@ if ( ! class_exists( 'WP_Models' ) ):
 		 			array(
 	 					'storage'	=> 'local',	//deafult to local. Set later by plugin controller
 	 					'url'		=> admin_url( 'admin-ajax.php' ),
-	 					'foo'=>'bar',
+	 					'flowplayerSwfUrl' => $this->js_uri . 'flowplayer/flowplayer.swf'
 	 				)
 	 			),
 	 			new Base_Model_JS_Object(
